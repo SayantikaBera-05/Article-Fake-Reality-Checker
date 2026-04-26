@@ -13,7 +13,7 @@ function App() {
   return (
     <Router>
       <CursorTracker />
-      <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container dark">
+      <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
         <TopNavBar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
