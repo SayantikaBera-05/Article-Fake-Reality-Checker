@@ -10,6 +10,7 @@ import SignIn from './pages/SignIn';
 
 function App() {
   return (
+    
     <Router>
       <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
         <TopNavBar />
