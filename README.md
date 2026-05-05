@@ -34,7 +34,7 @@ Verifi is engineered for scale and performance, divided into three core pillars:
 ## 📂 Repository Structure
 
 ```text
-Verifi/
+Article-Fake-Reality-Checker/
 ├── frontend/               # React SPA (Vite + TS)
 ├── backend/
 │   ├── node-gateway/        # Node.js Express Service (Auth & Data)
@@ -54,8 +54,8 @@ Verifi/
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/your-repo/verifi.git
-cd verifi
+git clone https://github.com/Joy-S-07/Article-Fake-Reality-Checker.git
+cd Article-Fake-Reality-Checker
 ```
 
 ### Step 2: Setup AI Engine
