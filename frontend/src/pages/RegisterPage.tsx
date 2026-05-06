@@ -1,8 +1,92 @@
+import { useState, useEffect, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { User, Mail, Lock } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 export function RegisterPage() {
+  const navigate = useNavigate();
+  const { register, isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // ─── Form State ──────────────────────────────────
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ─── Redirect if already authenticated ───────────
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+
+  // ─── Form Submission ─────────────────────────────
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    // Client-side validation
+    if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
+    if (name.trim().length < 2) {
+      setError('Name must be at least 2 characters.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await register(name.trim(), email.trim(), password);
+      // AuthContext stores the token and user — redirect to dashboard
+      navigate('/dashboard', { replace: true });
+    } catch (err: unknown) {
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        'response' in err &&
+        typeof (err as Record<string, unknown>).response === 'object'
+      ) {
+        const axiosErr = err as { response?: { data?: { message?: string } } };
+        setError(axiosErr.response?.data?.message || 'Registration failed. Please try again.');
+      } else {
+        setError('Network error. Please check your connection and try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ─── Google OAuth Redirect ───────────────────────
+  const handleGoogleSignUp = () => {
+    window.location.href = `${API_BASE}/auth/google`;
+  };
+
+  // Don't render while auth is hydrating
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#0A0F1C] relative">
       {/* Global grid pattern overlay */}
@@ -17,48 +101,88 @@ export function RegisterPage() {
         <h1 className="text-white text-3xl font-bold mb-2 text-center">Create an Account</h1>
         <p className="text-slate-400 text-sm text-center mb-8">Join Verifi to start fact-checking realities.</p>
 
-        <form className="space-y-4">
+        {/* Error Banner */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 bg-red-900/20 border border-red-800/50 rounded-xl px-4 py-3 flex items-start gap-3"
+          >
+            <AlertCircle size={18} className="text-red-400 mt-0.5 flex-shrink-0" />
+            <p className="text-red-300 text-sm">{error}</p>
+          </motion.div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
             <input 
+              id="register-name"
               type="text" 
-              placeholder="Full Name" 
-              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isSubmitting}
+              autoComplete="name"
+              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
             />
           </div>
 
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
             <input 
+              id="register-email"
               type="email" 
-              placeholder="Email Address" 
-              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isSubmitting}
+              autoComplete="email"
+              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
             />
           </div>
 
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
             <input 
+              id="register-password"
               type="password" 
-              placeholder="Password" 
-              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isSubmitting}
+              autoComplete="new-password"
+              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
             />
           </div>
 
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
             <input 
+              id="register-confirm-password"
               type="password" 
-              placeholder="Confirm Password" 
-              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={isSubmitting}
+              autoComplete="new-password"
+              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
             />
           </div>
 
           <button 
             type="submit"
-            className="w-full bg-[#00F0FF] text-black font-semibold rounded-full py-3 mt-6 hover:bg-cyan-400 transition-colors shadow-[0_0_15px_rgba(0,240,255,0.2)]"
+            disabled={isSubmitting}
+            className="w-full bg-[#00F0FF] text-black font-semibold rounded-full py-3 mt-6 hover:bg-cyan-400 transition-colors shadow-[0_0_15px_rgba(0,240,255,0.2)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Account
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Creating Account...
+              </>
+            ) : (
+              'Create Account'
+            )}
           </button>
         </form>
 
@@ -69,7 +193,10 @@ export function RegisterPage() {
         </div>
 
         <button 
-          className="w-full bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-full py-3 flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+          type="button"
+          onClick={handleGoogleSignUp}
+          disabled={isSubmitting}
+          className="w-full bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-full py-3 flex items-center justify-center gap-2 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

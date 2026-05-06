@@ -1,8 +1,89 @@
+import { useState, useEffect, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowRight, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // ─── Form State ──────────────────────────────────
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ─── Redirect if already authenticated ───────────
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+
+  // ─── Show session expired / OAuth error messages ─
+  useEffect(() => {
+    if (searchParams.get('session_expired') === 'true') {
+      setError('Your session has expired. Please sign in again.');
+    }
+    if (searchParams.get('error') === 'google_auth_failed') {
+      setError('Google sign-in failed. Please try again.');
+    }
+    if (searchParams.get('error') === 'oauth_failed') {
+      setError('OAuth sign-in failed. No token received.');
+    }
+  }, [searchParams]);
+
+  // ─── Form Submission ─────────────────────────────
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await login(email, password);
+      // AuthContext stores the token and user — redirect to dashboard
+      navigate('/dashboard', { replace: true });
+    } catch (err: unknown) {
+      // Extract error message from Axios response or fall back to generic
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        'response' in err &&
+        typeof (err as Record<string, unknown>).response === 'object'
+      ) {
+        const axiosErr = err as { response?: { data?: { message?: string } } };
+        setError(axiosErr.response?.data?.message || 'Login failed. Please check your credentials.');
+      } else {
+        setError('Network error. Please check your connection and try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ─── Google OAuth Redirect ───────────────────────
+  const handleGoogleSignIn = () => {
+    window.location.href = `${API_BASE}/auth/google`;
+  };
+
+  // Don't render while auth is hydrating
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0A0F1C] flex items-center justify-center transition-colors">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0F1C] flex items-center justify-center p-6 relative overflow-hidden transition-colors">
       {/* Background styling */}
@@ -36,34 +117,66 @@ export function LoginPage() {
         <div className="w-full md:w-7/12 p-8 md:p-12 lg:p-16">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 md:hidden transition-colors">Sign In</h2>
           
-          <form className="space-y-6">
+          {/* Error Banner */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 flex items-start gap-3"
+            >
+              <AlertCircle size={18} className="text-red-500 mt-0.5 flex-shrink-0" />
+              <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+            </motion.div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">Email Address</label>
+              <label htmlFor="login-email" className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">Email Address</label>
               <input 
+                id="login-email"
                 type="email" 
-                placeholder="you@example.com" 
-                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-primary transition-all"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
+                autoComplete="email"
+                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-primary transition-all disabled:opacity-50"
               />
             </div>
             
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">Password</label>
+                <label htmlFor="login-password" className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">Password</label>
                 <a href="#" className="text-xs text-primary hover:text-cyan-300 transition">Forgot password?</a>
               </div>
               <input 
+                id="login-password"
                 type="password" 
-                placeholder="••••••••" 
-                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-primary transition-all"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
+                autoComplete="current-password"
+                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-primary transition-all disabled:opacity-50"
               />
             </div>
 
             <button 
-              type="button"
-              className="w-full bg-primary text-black rounded-xl py-3 font-bold hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(0,240,255,0.2)] hover:shadow-[0_0_25px_rgba(0,240,255,0.4)] flex items-center justify-center gap-2 mt-4"
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-primary text-black rounded-xl py-3 font-bold hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(0,240,255,0.2)] hover:shadow-[0_0_25px_rgba(0,240,255,0.4)] flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In
-              <ArrowRight size={18} />
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight size={18} />
+                </>
+              )}
             </button>
           </form>
 
@@ -77,8 +190,10 @@ export function LoginPage() {
           </div>
 
           <button 
-            type="button" 
-            className="mt-6 w-full bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-3.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition flex items-center justify-center gap-3 border border-slate-200 dark:border-slate-800"
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isSubmitting}
+            className="mt-6 w-full bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-3.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition flex items-center justify-center gap-3 border border-slate-200 dark:border-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
