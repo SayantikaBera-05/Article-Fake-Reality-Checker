@@ -110,10 +110,10 @@ You will need to configure `.env` files in each service directory. Key variables
 
 Verifi is built with 🧠 and ❤️ by:
 
-- **Joy** - [Profile](https://github.com/joy)
+- **Joy** - [Profile](https://github.com/Joy-S-07)
 - **Shubhadip** - [Profile](https://github.com/Shubhadip-Codes)
 - **Aranya** - [Profile](https://github.com/AKr3106)
-- **Sayantika** - [Profile](https://github.com/SayantikaBera-05)
+- **Sayantika** - [Profile]()
 
 ---
 
