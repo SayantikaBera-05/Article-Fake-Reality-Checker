@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://article-fake-reality-checker.onrender.com/api';
 
 export function RegisterPage() {
   const navigate = useNavigate();

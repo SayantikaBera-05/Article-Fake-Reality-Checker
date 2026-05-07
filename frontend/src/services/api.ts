@@ -17,7 +17,7 @@ import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 // ─── Axios Instance ────────────────────────────────
 // Uses the VITE_API_BASE_URL from the frontend .env file.
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://article-fake-reality-checker.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
