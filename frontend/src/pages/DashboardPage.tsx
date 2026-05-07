@@ -1,24 +1,63 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { LayoutDashboard, History, Bookmark, Settings, ShieldCheck, AlertTriangle, Brain, Zap, ArrowRight, Menu, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, History, Bookmark, Settings, ShieldCheck, AlertTriangle, Brain, Zap, ArrowRight, Menu, X, Home, Loader2, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { fraudAPI } from '../services/api';
 
 export function DashboardPage() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(true);
 
-  const stats = [
-    { title: "Total Claims Verified", value: "142", change: "+12% this week", icon: <ShieldCheck size={24} className="text-primary" />, color: "text-green-400" },
-    { title: "Misinformation Detected", value: "89", change: "+5% this week", icon: <AlertTriangle size={24} className="text-orange-500" />, color: "text-orange-500" },
-    { title: "Average Confidence Score", value: "91%", change: "+2% this week", icon: <Brain size={24} className="text-purple-400" />, color: "text-green-400" },
-    { title: "API Credits Remaining", value: "8,450", change: "-450 today", icon: <Zap size={24} className="text-yellow-400" />, color: "text-slate-400" },
-  ];
+  const [stats, setStats] = useState([
+    { title: "Total Claims Verified", value: "—", change: "", icon: <ShieldCheck size={24} className="text-primary" />, color: "text-green-400" },
+    { title: "Misinformation Detected", value: "—", change: "", icon: <AlertTriangle size={24} className="text-orange-500" />, color: "text-orange-500" },
+    { title: "Average Confidence Score", value: "—", change: "", icon: <Brain size={24} className="text-purple-400" />, color: "text-green-400" },
+    { title: "Fraud Rate", value: "—", change: "", icon: <Zap size={24} className="text-yellow-400" />, color: "text-slate-400" },
+  ]);
 
-  const recentActivity = [
-    { claim: "The Earth's core has completely stopped...", date: "2 hrs ago", veracity: "Mostly False", color: "text-orange-500", bg: "bg-orange-500/10" },
-    { claim: "NASA confirms the discovery of a new...", date: "5 hrs ago", veracity: "True", color: "text-green-500", bg: "bg-green-500/10" },
-    { claim: "Drinking 8 cups of coffee a day extends...", date: "1 day ago", veracity: "False", color: "text-red-500", bg: "bg-red-500/10" },
-    { claim: "Eating carrots significantly improves your...", date: "2 days ago", veracity: "Misleading", color: "text-yellow-500", bg: "bg-yellow-500/10" },
-  ];
+  const [recentActivity, setRecentActivity] = useState<{claim: string; date: string; veracity: string; color: string; bg: string}[]>([]);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      const [statsRes, reportsRes] = await Promise.all([
+        fraudAPI.getStats(),
+        fraudAPI.getReports(1, 4),
+      ]);
+
+      const s = statsRes.data.data;
+      setStats([
+        { title: "Total Claims Verified", value: String(s.totalReports), change: "", icon: <ShieldCheck size={24} className="text-primary" />, color: "text-green-400" },
+        { title: "Misinformation Detected", value: String(s.fraudulent), change: "", icon: <AlertTriangle size={24} className="text-orange-500" />, color: "text-orange-500" },
+        { title: "Average Risk Score", value: `${s.averageRiskScore}%`, change: "", icon: <Brain size={24} className="text-purple-400" />, color: "text-green-400" },
+        { title: "Fraud Rate", value: `${s.fraudRate}%`, change: "", icon: <Zap size={24} className="text-yellow-400" />, color: "text-slate-400" },
+      ]);
+
+      const reports = reportsRes.data.data.reports;
+      setRecentActivity(reports.map((r) => {
+        const claim = r.inputData?.description || JSON.stringify(r.inputData).slice(0, 60);
+        const date = new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const isFraud = r.result?.isFraud;
+        const score = r.result?.riskScore || 0;
+        let veracity = 'Legitimate';
+        let color = 'text-green-500';
+        let bg = 'bg-green-500/10';
+        if (isFraud && score >= 80) { veracity = 'False'; color = 'text-red-500'; bg = 'bg-red-500/10'; }
+        else if (isFraud) { veracity = 'Suspicious'; color = 'text-orange-500'; bg = 'bg-orange-500/10'; }
+        return { claim, date, veracity, color, bg };
+      }));
+    } catch {
+      // Stats may fail if no reports exist yet — that's OK
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   const navLinks = [
     { name: "Overview", icon: <LayoutDashboard size={20} />, active: true, to: "/dashboard" },
@@ -68,13 +107,13 @@ export function DashboardPage() {
         </nav>
 
         <div className="p-4 mb-4">
-          <div className="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 text-center">
-            <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-3">
-              <Zap size={20} />
-            </div>
-            <p className="text-xs text-slate-400 mb-2">Upgrade to Pro for unlimited API credits.</p>
-            <button className="w-full text-xs font-bold bg-primary text-black py-2 rounded-lg hover:bg-cyan-400 transition shadow-[0_0_10px_rgba(0,240,255,0.2)]">Upgrade Now</button>
-          </div>
+          <button
+            onClick={async () => { await logout(); navigate('/', { replace: true }); }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-800/50"
+          >
+            <LogOut size={16} />
+            Logout
+          </button>
         </div>
       </aside>
 
@@ -84,9 +123,18 @@ export function DashboardPage() {
         <div className="absolute inset-0 bg-grid-pattern opacity-[0.3] mix-blend-overlay pointer-events-none z-0"></div>
 
         <div className="max-w-6xl mx-auto relative z-10 pt-4">
-          <header className="mb-10">
-            <h1 className="text-3xl font-bold text-white mb-2">Dashboard Overview</h1>
-            <p className="text-slate-400 text-sm">Welcome back, Marcus. Here's a summary of your platform usage.</p>
+          <header className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Dashboard Overview</h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Welcome back{user ? `, ${user.name.split(' ')[0]}` : ''}. Here's a summary of your activity.</p>
+            </div>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition border border-slate-200 dark:border-slate-700 shadow-sm w-fit"
+            >
+              <Home size={16} />
+              Back to Main Page
+            </Link>
           </header>
 
           {/* Stats Grid */}

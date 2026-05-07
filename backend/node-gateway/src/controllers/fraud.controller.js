@@ -1,14 +1,34 @@
 import axios from "axios";
 import FraudReport from "../models/FraudReport.model.js";
+import { createHistoryEntry } from "../services/history.service.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const PYTHON_ENGINE_URL = process.env.PYTHON_ENGINE_URL || "http://localhost:8000";
 
 // ─── Submit Fraud Check ────────────────────────────
+// Supports both authenticated users and guests (via optionalAuth middleware).
+// Authenticated: uses req.user._id
+// Guest: uses x-guest-session-id header or guestSessionId body field
 export const checkFraud = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user?._id || null;
+  const guestSessionId =
+    req.headers["x-guest-session-id"] || req.body.guestSessionId || null;
+
+  // At least one identifier is required
+  if (!userId && !guestSessionId) {
+    throw new AppError(
+      "Authentication required. Please sign in or use guest mode.",
+      401
+    );
+  }
+
   const inputData = req.body;
+
+  // Determine input type from transactionType
+  let inputType = "text";
+  if (inputData.transactionType === "url_verification") inputType = "url";
+  else if (inputData.transactionType === "image_verification") inputType = "image";
 
   // Forward payload to Python engine
   let engineResponse;
@@ -31,24 +51,48 @@ export const checkFraud = asyncHandler(async (req, res) => {
     throw new AppError("Failed to communicate with the fraud detection engine", 502);
   }
 
-  // Persist the complete report
-  const report = await FraudReport.create({
+  const resultData = {
+    isFraud: engineResponse.isFraud,
+    riskScore: engineResponse.riskScore,
+    confidenceLevel: engineResponse.confidenceLevel,
+    flags: engineResponse.flags || [],
+    analysisSummary: engineResponse.analysisSummary,
+  };
+
+  // Persist the FraudReport (only for authenticated users)
+  let report = null;
+  if (userId) {
+    report = await FraudReport.create({
+      userId,
+      inputData,
+      result: resultData,
+      status: "completed",
+    });
+  }
+
+  // Create a VerificationHistory entry (for both guests and users)
+  await createHistoryEntry({
     userId,
-    inputData,
-    result: {
-      isFraud: engineResponse.isFraud,
-      riskScore: engineResponse.riskScore,
-      confidenceLevel: engineResponse.confidenceLevel,
-      flags: engineResponse.flags || [],
-      analysisSummary: engineResponse.analysisSummary,
-    },
+    sessionId: guestSessionId,
+    inputType,
+    inputContent: inputData.description || JSON.stringify(inputData),
+    result: resultData,
     status: "completed",
+    metadata: {
+      merchantName: inputData.merchantName,
+      transactionType: inputData.transactionType,
+    },
   });
 
   res.status(201).json({
     success: true,
     message: "Fraud analysis completed",
-    data: report,
+    data: report || {
+      inputData,
+      result: resultData,
+      status: "completed",
+      isGuest: true,
+    },
   });
 });
 

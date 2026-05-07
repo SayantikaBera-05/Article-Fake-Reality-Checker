@@ -9,6 +9,9 @@ import { HowItWorksPage } from './pages/HowItWorksPage';
 import { SavedEvidencePage } from './pages/SavedEvidencePage';
 import { SettingsPage } from './pages/SettingsPage';
 import { OAuthSuccessPage } from './pages/OAuthSuccessPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { Footer } from './components';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
@@ -32,6 +35,11 @@ function App() {
               <Route path="/how-it-works" element={<HowItWorksPage />} />
               <Route path="/saved-evidence" element={<SavedEvidencePage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              {/* Password Reset */}
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              {/* Profile */}
+              <Route path="/profile" element={<ProfilePage />} />
               {/* OAuth callback route — backend redirects here after Google sign-in */}
               <Route path="/oauth-success" element={<OAuthSuccessPage />} />
             </Routes>

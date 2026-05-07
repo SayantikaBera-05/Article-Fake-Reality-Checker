@@ -2,13 +2,16 @@ import crypto from "crypto";
 import User from "../models/User.model.js";
 import BlacklistedToken from "../models/BlacklistedToken.model.js";
 import { generateToken, verifyToken } from "../utils/jwt.js";
-import { sendVerificationEmail, sendPasswordResetEmail } from "../utils/email.js";
+import { sendVerificationEmail } from "../utils/email.js";
+import { initiateReset, executeReset } from "../services/password.service.js";
+import { claimGuestSession } from "../services/guest.service.js";
+import { logEvent } from "../services/ledger.service.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 // ─── Register (Local) ──────────────────────────────
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, guestSessionId } = req.body;
 
   // Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -34,6 +37,24 @@ export const register = asyncHandler(async (req, res) => {
     console.error("⚠ Failed to send verification email:", emailErr.message);
   }
 
+  // Claim guest session if one was provided
+  let guestMigration = null;
+  if (guestSessionId) {
+    guestMigration = await claimGuestSession(guestSessionId, user._id, req);
+  }
+
+  // Audit log
+  await logEvent({
+    userId: user._id,
+    action: "register",
+    method: "Email",
+    status: "success",
+    req,
+    details: guestMigration
+      ? { guestSessionClaimed: true, migratedHistory: guestMigration.migratedCount }
+      : null,
+  });
+
   const token = generateToken(user._id);
 
   res.status(201).json({
@@ -45,20 +66,31 @@ export const register = asyncHandler(async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        bio: user.bio,
         isEmailVerified: user.isEmailVerified,
       },
       token,
+      guestMigration: guestMigration
+        ? { migratedCount: guestMigration.migratedCount }
+        : null,
     },
   });
 });
 
 // ─── Login (Local) ─────────────────────────────────
 export const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, guestSessionId } = req.body;
 
   // Find user and include password field
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
+    await logEvent({
+      action: "login",
+      method: "Email",
+      status: "failure",
+      req,
+      details: { reason: "Invalid email" },
+    });
     throw new AppError("Invalid email or password", 401);
   }
 
@@ -69,8 +101,34 @@ export const login = asyncHandler(async (req, res) => {
 
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
+    await logEvent({
+      userId: user._id,
+      action: "login",
+      method: "Email",
+      status: "failure",
+      req,
+      details: { reason: "Wrong password" },
+    });
     throw new AppError("Invalid email or password", 401);
   }
+
+  // Claim guest session if one was provided
+  let guestMigration = null;
+  if (guestSessionId) {
+    guestMigration = await claimGuestSession(guestSessionId, user._id, req);
+  }
+
+  // Audit log
+  await logEvent({
+    userId: user._id,
+    action: "login",
+    method: "Email",
+    status: "success",
+    req,
+    details: guestMigration
+      ? { guestSessionClaimed: true, migratedHistory: guestMigration.migratedCount }
+      : null,
+  });
 
   const token = generateToken(user._id);
 
@@ -83,10 +141,14 @@ export const login = asyncHandler(async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        bio: user.bio,
         avatar: user.avatar,
         isEmailVerified: user.isEmailVerified,
       },
       token,
+      guestMigration: guestMigration
+        ? { migratedCount: guestMigration.migratedCount }
+        : null,
     },
   });
 });
@@ -101,6 +163,13 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
+    await logEvent({
+      action: "email-verify",
+      method: "Email",
+      status: "failure",
+      req,
+      details: { reason: "Invalid or expired verification token" },
+    });
     throw new AppError("Invalid or expired verification token", 400);
   }
 
@@ -108,6 +177,14 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   user.emailVerificationToken = undefined;
   user.emailVerificationExpires = undefined;
   await user.save();
+
+  await logEvent({
+    userId: user._id,
+    action: "email-verify",
+    method: "Email",
+    status: "success",
+    req,
+  });
 
   res.json({
     success: true,
@@ -119,29 +196,10 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    // Don't reveal whether email exists
-    return res.json({
-      success: true,
-      message: "If an account with that email exists, a password reset link has been sent.",
-    });
-  }
+  // Delegate to the password service (handles hashing, email, logging)
+  await initiateReset(email, req);
 
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  user.passwordResetToken = resetToken;
-  user.passwordResetExpires = Date.now() + 60 * 60 * 1000; // 1 hour
-  await user.save({ validateBeforeSave: false });
-
-  try {
-    await sendPasswordResetEmail(email, resetToken);
-  } catch (emailErr) {
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save({ validateBeforeSave: false });
-    throw new AppError("Failed to send reset email. Please try again later.", 500);
-  }
-
+  // Always return the same message (anti-enumeration)
   res.json({
     success: true,
     message: "If an account with that email exists, a password reset link has been sent.",
@@ -152,25 +210,15 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 export const resetPassword = asyncHandler(async (req, res) => {
   const { token, password } = req.body;
 
-  const user = await User.findOne({
-    passwordResetToken: token,
-    passwordResetExpires: { $gt: Date.now() },
-  });
-
-  if (!user) {
-    throw new AppError("Invalid or expired reset token", 400);
-  }
-
-  user.password = password;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  await user.save();
+  // Delegate to the password service (validates token, updates password,
+  // sets passwordChangedAt, logs to ledger)
+  const user = await executeReset(token, password, req);
 
   const jwtToken = generateToken(user._id);
 
   res.json({
     success: true,
-    message: "Password reset successful",
+    message: "Password reset successful. All previous sessions have been invalidated.",
     data: { token: jwtToken },
   });
 });
@@ -202,6 +250,15 @@ export const logout = asyncHandler(async (req, res) => {
   // Add to blacklist — the TTL index on the model will auto-delete
   // this document once the original token expiry time is reached.
   await BlacklistedToken.create({ token, expiresAt });
+
+  // Audit log
+  await logEvent({
+    userId: req.user._id,
+    action: "logout",
+    method: "Local",
+    status: "success",
+    req,
+  });
 
   res.json({
     success: true,

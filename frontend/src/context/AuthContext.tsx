@@ -1,16 +1,18 @@
 /**
  * Authentication Context
  * ──────────────────────
- * Manages global authentication state across the React app.
+ * Manages global authentication state across the React app,
+ * including guest session management for anonymous users.
  *
  * Flow:
  * 1. On mount → checks localStorage for a token → if found, calls GET /auth/me to hydrate user state
- * 2. login()  → POST /auth/login → stores token + sets user state
- * 3. register() → POST /auth/register → stores token + sets user state
- * 4. logout() → POST /auth/logout (blacklists token on backend) → clears localStorage + state
+ * 2. If no token → generates a guest session UUID and registers it with the backend
+ * 3. login()  → POST /auth/login (with guestSessionId) → stores token + sets user state
+ * 4. register() → POST /auth/register (with guestSessionId) → stores token + sets user state
+ * 5. logout() → POST /auth/logout (blacklists token on backend) → clears localStorage + state
  *
- * The 401 interceptor in services/api.ts handles forced logouts (expired/blacklisted tokens)
- * independently — this context handles intentional logouts.
+ * Guest sessions are automatically claimed on login/register,
+ * merging all guest verification history into the user's account.
  */
 
 import {
@@ -21,7 +23,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { authAPI, type User } from "../services/api";
+import { authAPI, guestAPI, type User } from "../services/api";
 
 // ─── TypeScript Interfaces ─────────────────────────
 
@@ -32,6 +34,10 @@ interface AuthContextType {
   token: string | null;
   /** Quick boolean check for auth status */
   isAuthenticated: boolean;
+  /** True when user is in guest mode */
+  isGuest: boolean;
+  /** The guest session UUID (null if authenticated) */
+  guestSessionId: string | null;
   /** True while the context is hydrating user state on initial load */
   isLoading: boolean;
   /** Log in with email and password */
@@ -48,6 +54,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// ─── UUID Generator ────────────────────────────────
+
+const generateUUID = (): string => {
+  return crypto.randomUUID();
+};
+
 // ─── Provider ──────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -55,18 +67,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(
     () => localStorage.getItem("token") // Initialize from localStorage
   );
+  const [guestSessionId, setGuestSessionId] = useState<string | null>(
+    () => localStorage.getItem("guestSessionId")
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const isAuthenticated = !!user && !!token;
+  const isGuest = !isAuthenticated && !!guestSessionId;
 
   /**
    * Hydrate user state from the backend using the stored token.
    * Called on initial mount and after OAuth callback.
    */
-  const hydrateUser = useCallback(async (currentToken: string) => {
+  const hydrateUser = useCallback(async (_currentToken: string) => {
     try {
-      // Token is already in localStorage, and the axios interceptor
-      // will attach it automatically to this request.
       const response = await authAPI.getMe();
       setUser(response.data.data.user);
     } catch {
@@ -79,13 +93,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /**
-   * On initial mount: if a token exists in localStorage, validate it
-   * by fetching the current user profile from the backend.
+   * Initialize guest session if no auth token is present.
+   */
+  const initGuestSession = useCallback(async () => {
+    let sessionId = localStorage.getItem("guestSessionId");
+
+    if (!sessionId) {
+      sessionId = generateUUID();
+      localStorage.setItem("guestSessionId", sessionId);
+    }
+
+    setGuestSessionId(sessionId);
+
+    try {
+      await guestAPI.init(sessionId);
+    } catch {
+      // Guest init failure is non-critical — the session still works locally
+      console.warn("Failed to register guest session with backend.");
+    }
+  }, []);
+
+  /**
+   * On initial mount: if a token exists, validate it.
+   * Otherwise, initialize a guest session.
    */
   useEffect(() => {
     const initAuth = async () => {
       if (token) {
         await hydrateUser(token);
+      } else {
+        await initGuestSession();
       }
       setIsLoading(false);
     };
@@ -94,29 +131,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /**
    * Login: POST /auth/login → save token → set user state.
+   * If a guest session exists, sends it for claiming/merging.
    */
-  const login = useCallback(async (email: string, password: string) => {
-    const response = await authAPI.login(email, password);
-    const { token: newToken, user: userData } = response.data.data;
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const currentGuestId = localStorage.getItem("guestSessionId") || undefined;
+      const response = await authAPI.login(email, password, currentGuestId);
+      const { token: newToken, user: userData } = response.data.data;
 
-    // Persist token for future sessions
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(userData));
+      // Persist token for future sessions
+      localStorage.setItem("token", newToken);
+      localStorage.setItem("user", JSON.stringify(userData));
 
-    setToken(newToken);
-    setUser(userData);
-  }, []);
+      // Clear guest session — it has been claimed by the backend
+      localStorage.removeItem("guestSessionId");
+      setGuestSessionId(null);
+
+      setToken(newToken);
+      setUser(userData);
+    },
+    []
+  );
 
   /**
    * Register: POST /auth/register → save token → set user state.
+   * If a guest session exists, sends it for claiming/merging.
    */
   const register = useCallback(
     async (name: string, email: string, password: string) => {
-      const response = await authAPI.register(name, email, password);
+      const currentGuestId = localStorage.getItem("guestSessionId") || undefined;
+      const response = await authAPI.register(name, email, password, currentGuestId);
       const { token: newToken, user: userData } = response.data.data;
 
       localStorage.setItem("token", newToken);
       localStorage.setItem("user", JSON.stringify(userData));
+
+      // Clear guest session
+      localStorage.removeItem("guestSessionId");
+      setGuestSessionId(null);
 
       setToken(newToken);
       setUser(userData);
@@ -126,27 +178,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /**
    * Logout: POST /auth/logout (blacklists the token on the backend)
-   * → clear localStorage → clear state.
-   *
-   * The backend adds the current JWT to its blacklist collection,
-   * preventing it from being used again even if not yet expired.
+   * → clear localStorage → clear state → re-initialize guest session.
    */
   const logout = useCallback(async () => {
     try {
-      // Send the token to the backend to be blacklisted.
-      // The axios interceptor automatically attaches the Bearer token.
       await authAPI.logout();
     } catch {
-      // Even if the API call fails (e.g., network error),
-      // we still clear the client-side state for security.
       console.warn("Backend logout failed, clearing local state anyway.");
     } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       setToken(null);
       setUser(null);
+
+      // Re-initialize a fresh guest session
+      await initGuestSession();
     }
-  }, []);
+  }, [initGuestSession]);
 
   /**
    * Set a token directly (used by OAuth callback page) and hydrate user state.
@@ -155,6 +203,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (newToken: string) => {
       localStorage.setItem("token", newToken);
       setToken(newToken);
+
+      // Clear guest session if present
+      localStorage.removeItem("guestSessionId");
+      setGuestSessionId(null);
+
       await hydrateUser(newToken);
     },
     [hydrateUser]
@@ -166,6 +219,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         token,
         isAuthenticated,
+        isGuest,
+        guestSessionId,
         isLoading,
         login,
         register,
@@ -185,7 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
  * Must be used within an <AuthProvider>.
  *
  * @example
- * const { user, isAuthenticated, login, logout } = useAuth();
+ * const { user, isAuthenticated, isGuest, login, logout } = useAuth();
  */
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);

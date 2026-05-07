@@ -17,6 +17,7 @@ export const registerSchema = z.object({
     .string({ required_error: "Password is required" })
     .min(6, "Password must be at least 6 characters")
     .max(128, "Password must be at most 128 characters"),
+  guestSessionId: z.string().uuid().optional(),
 });
 
 // ─── Login ─────────────────────────────────────────
@@ -29,6 +30,7 @@ export const loginSchema = z.object({
   password: z
     .string({ required_error: "Password is required" })
     .min(1, "Password is required"),
+  guestSessionId: z.string().uuid().optional(),
 });
 
 // ─── Forgot Password ──────────────────────────────

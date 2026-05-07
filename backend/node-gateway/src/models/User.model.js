@@ -38,9 +38,18 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    bio: {
+      type: String,
+      maxlength: 500,
+      default: "",
+    },
     isEmailVerified: {
       type: Boolean,
       default: false,
+    },
+    passwordChangedAt: {
+      type: Date,
+      default: null,
     },
     emailVerificationToken: String,
     emailVerificationExpires: Date,
@@ -60,6 +69,10 @@ userSchema.pre("save", async function (next) {
   if (!this.isModified("password") || !this.password) return next();
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
+  // Track when the password was last changed (for session invalidation)
+  if (!this.isNew) {
+    this.passwordChangedAt = new Date();
+  }
   next();
 });
 

@@ -9,7 +9,9 @@ import asyncHandler from "../utils/asyncHandler.js";
  * and attaches the user document to `req.user`.
  *
  * Also checks the token blacklist to reject revoked tokens
- * (e.g., tokens from logged-out sessions).
+ * (e.g., tokens from logged-out sessions) and validates
+ * `passwordChangedAt` to reject tokens issued before a
+ * password change.
  */
 const isAuth = asyncHandler(async (req, _res, next) => {
   let token;
@@ -40,6 +42,21 @@ const isAuth = asyncHandler(async (req, _res, next) => {
       throw new AppError("User belonging to this token no longer exists", 401);
     }
 
+    // ─── Password Changed Check ──────────────────────
+    // Reject tokens issued before the last password change.
+    // This invalidates ALL active sessions after a password reset.
+    if (user.passwordChangedAt) {
+      const changedTimestamp = Math.floor(
+        user.passwordChangedAt.getTime() / 1000
+      );
+      if (decoded.iat < changedTimestamp) {
+        throw new AppError(
+          "Password was recently changed. Please log in again.",
+          401
+        );
+      }
+    }
+
     req.user = user;
     next();
   } catch (error) {
@@ -51,6 +68,61 @@ const isAuth = asyncHandler(async (req, _res, next) => {
     }
     throw error;
   }
+});
+
+/**
+ * Optional authentication middleware.
+ * Attaches `req.user` if a valid token is present, but does NOT
+ * throw if no token is provided — allows guest access to the route.
+ *
+ * Used for routes that support both authenticated and guest users
+ * (e.g., the fraud check endpoint).
+ */
+const optionalAuth = asyncHandler(async (req, _res, next) => {
+  let token;
+
+  if (req.headers.authorization?.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) {
+    req.user = null;
+    return next();
+  }
+
+  try {
+    const decoded = verifyToken(token);
+
+    const isBlacklisted = await BlacklistedToken.exists({ token });
+    if (isBlacklisted) {
+      req.user = null;
+      return next();
+    }
+
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      req.user = null;
+      return next();
+    }
+
+    // Password changed check
+    if (user.passwordChangedAt) {
+      const changedTimestamp = Math.floor(
+        user.passwordChangedAt.getTime() / 1000
+      );
+      if (decoded.iat < changedTimestamp) {
+        req.user = null;
+        return next();
+      }
+    }
+
+    req.user = user;
+  } catch {
+    // Any JWT error — treat as guest
+    req.user = null;
+  }
+
+  next();
 });
 
 /**
@@ -66,4 +138,4 @@ const restrictTo = (...roles) => {
   };
 };
 
-export { isAuth, restrictTo };
+export { isAuth, optionalAuth, restrictTo };

@@ -27,12 +27,20 @@ const api = axios.create({
 // ─── Request Interceptor ───────────────────────────
 // Attaches the JWT token from localStorage to every outgoing
 // request as a Bearer token in the Authorization header.
+// Also attaches the guest session ID if present.
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem("token");
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Attach guest session ID for guest-capable routes
+    const guestSessionId = localStorage.getItem("guestSessionId");
+    if (guestSessionId && config.headers) {
+      config.headers["X-Guest-Session-Id"] = guestSessionId;
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -66,8 +74,11 @@ export interface User {
   name: string;
   email: string;
   role: "user" | "admin";
+  bio: string;
   avatar: string | null;
   isEmailVerified: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthResponse {
@@ -76,6 +87,9 @@ export interface AuthResponse {
   data: {
     user: User;
     token: string;
+    guestMigration?: {
+      migratedCount: number;
+    } | null;
   };
 }
 
@@ -89,6 +103,7 @@ export interface FraudCheckPayload {
   ipAddress?: string;
   deviceId?: string;
   description?: string;
+  guestSessionId?: string;
 }
 
 export interface FraudResult {
@@ -109,16 +124,36 @@ export interface FraudReport {
   updatedAt: string;
 }
 
+export interface VerificationHistoryEntry {
+  _id: string;
+  userId: string | null;
+  sessionId: string | null;
+  inputType: "text" | "url" | "image";
+  inputContent: string;
+  result: FraudResult;
+  status: "pending" | "completed" | "failed";
+  metadata: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProfileData {
+  user: User;
+  stats: {
+    totalVerifications: number;
+  };
+}
+
 // ─── Auth API ──────────────────────────────────────
 
 export const authAPI = {
   /** Register a new user with email and password */
-  register: (name: string, email: string, password: string) =>
-    api.post<AuthResponse>("/auth/register", { name, email, password }),
+  register: (name: string, email: string, password: string, guestSessionId?: string) =>
+    api.post<AuthResponse>("/auth/register", { name, email, password, guestSessionId }),
 
   /** Log in with email and password */
-  login: (email: string, password: string) =>
-    api.post<AuthResponse>("/auth/login", { email, password }),
+  login: (email: string, password: string, guestSessionId?: string) =>
+    api.post<AuthResponse>("/auth/login", { email, password, guestSessionId }),
 
   /** Log out — sends token to backend for blacklisting */
   logout: () => api.post("/auth/logout"),
@@ -136,7 +171,10 @@ export const authAPI = {
 
   /** Reset password with token */
   resetPassword: (token: string, password: string) =>
-    api.post("/auth/reset-password", { token, password }),
+    api.post<{ success: boolean; message: string; data: { token: string } }>(
+      "/auth/reset-password",
+      { token, password }
+    ),
 };
 
 // ─── Fraud API ─────────────────────────────────────
@@ -181,9 +219,16 @@ export const fraudAPI = {
 // ─── User API ──────────────────────────────────────
 
 export const userAPI = {
-  /** Update profile fields (name, avatar) */
-  updateProfile: (data: { name?: string; avatar?: string }) =>
-    api.patch("/users/profile", data),
+  /** Get full profile with stats */
+  getProfile: () =>
+    api.get<{ success: boolean; data: ProfileData }>("/users/profile"),
+
+  /** Update profile fields (name, bio, avatar) */
+  updateProfile: (data: { name?: string; bio?: string; avatar?: string }) =>
+    api.patch<{ success: boolean; message: string; data: { user: User } }>(
+      "/users/profile",
+      data
+    ),
 
   /** Change password */
   changePassword: (currentPassword: string, newPassword: string) =>
@@ -191,6 +236,24 @@ export const userAPI = {
 
   /** Delete account permanently */
   deleteAccount: () => api.delete("/users/account"),
+};
+
+// ─── Guest API ─────────────────────────────────────
+
+export const guestAPI = {
+  /** Initialize a guest session */
+  init: (sessionId: string) =>
+    api.post("/guest/init", { sessionId }),
+
+  /** Get verification history for a guest session */
+  getHistory: (sessionId: string, page = 1, limit = 20) =>
+    api.get<{
+      success: boolean;
+      data: {
+        history: VerificationHistoryEntry[];
+        pagination: { page: number; limit: number; total: number; pages: number };
+      };
+    }>("/guest/history", { params: { sessionId, page, limit } }),
 };
 
 export default api;

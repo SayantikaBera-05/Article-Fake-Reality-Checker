@@ -33,4 +33,8 @@ export const fraudCheckSchema = z.object({
   metadata: z
     .record(z.unknown())
     .optional(),
+  guestSessionId: z
+    .string()
+    .uuid()
+    .optional(),
 });

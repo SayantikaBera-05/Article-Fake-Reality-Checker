@@ -22,7 +22,7 @@ type VerifyTab = 'text' | 'url' | 'image';
 
 export function VerifyPage() {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isGuest, guestSessionId, isLoading: authLoading } = useAuth();
 
   // ─── Input State ─────────────────────────────────
   const [textInput, setTextInput] = useState('');
@@ -34,12 +34,7 @@ export function VerifyPage() {
   const [result, setResult] = useState<FraudResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // ─── Auth Guard ──────────────────────────────────
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, authLoading, navigate]);
+  // Guest mode — no redirect, just show a banner below
 
   // ─── Submit Text Verification ────────────────────
   const handleTextSubmit = async (e: FormEvent) => {
@@ -84,7 +79,10 @@ export function VerifyPage() {
     setIsAnalyzing(true);
 
     try {
-      const response = await fraudAPI.check(payload as never);
+      const response = await fraudAPI.check({
+        ...payload,
+        ...(guestSessionId && !isAuthenticated ? { guestSessionId } : {}),
+      } as never);
       // The backend stores the full report; we extract the result portion
       setResult(response.data.data.result);
     } catch (err: unknown) {
@@ -157,8 +155,22 @@ export function VerifyPage() {
         </Link>
         <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">Verification Center</h1>
         <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl">
-          Select a verification method below. Our multimodal engine powered by Gemini 1.5 Pro will analyze the content and detect any fabrications or misleading claims.
+          Select a verification method below. Our multimodal engine powered by Gemini will analyze the content and detect any fabrications or misleading claims.
         </p>
+        {isGuest && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-4 inline-flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl px-4 py-2.5"
+          >
+            <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+            <span className="text-amber-700 dark:text-amber-300 text-sm">
+              You're in guest mode.{' '}
+              <Link to="/register" className="font-semibold underline underline-offset-2 hover:text-amber-900 dark:hover:text-amber-100 transition">Create an account</Link>
+              {' '}to save your verification history.
+            </span>
+          </motion.div>
+        )}
       </header>
 
       <main className="relative z-20 max-w-7xl mx-auto w-full flex-1 flex flex-col">
