@@ -35,7 +35,7 @@ export const checkFraud = asyncHandler(async (req, res) => {
   try {
     const response = await axios.post(`${PYTHON_ENGINE_URL}/detect`, inputData, {
       headers: { "Content-Type": "application/json" },
-      timeout: 30000, // 30s timeout for ML processing
+      timeout: 120000, // 120s — RAG pipeline (Scout→Reader→Analyst) takes 40–90s
     });
     engineResponse = response.data;
   } catch (error) {

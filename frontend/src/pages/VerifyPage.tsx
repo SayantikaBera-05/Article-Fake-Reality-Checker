@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText,
@@ -17,6 +17,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { fraudAPI, type FraudResult } from '../services/api';
+import { FraudDetectionLoading } from '../components';
 
 type VerifyTab = 'text' | 'url' | 'image';
 
@@ -117,56 +118,56 @@ export function VerifyPage() {
   const getConfidenceColor = (level: string) => {
     switch (level) {
       case 'Critical': return { text: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30' };
-      case 'High': return { text: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30' };
-      case 'Medium': return { text: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30' };
-      default: return { text: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30' };
+      case 'High': return { text: 'text-orange-600', bg: 'bg-orange-500/10', border: 'border-orange-500/30' };
+      case 'Medium': return { text: 'text-amber-600', bg: 'bg-amber-500/10', border: 'border-amber-500/30' };
+      default: return { text: 'text-green-600', bg: 'bg-green-500/10', border: 'border-green-500/30' };
     }
   };
 
   // ─── Get risk score color ────────────────────────
   const getRiskScoreColor = (score: number) => {
-    if (score >= 85) return 'from-red-600 to-red-400';
-    if (score >= 60) return 'from-orange-600 to-orange-400';
-    if (score >= 35) return 'from-yellow-600 to-yellow-400';
-    return 'from-green-600 to-green-400';
+    if (score >= 85) return 'from-red-600 to-red-500';
+    if (score >= 60) return 'from-orange-600 to-orange-500';
+    if (score >= 35) return 'from-amber-600 to-amber-500';
+    return 'from-green-600 to-green-500';
   };
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#0A0F1C] flex items-center justify-center transition-colors">
+      <div className="min-h-screen bg-slate-50 dark:bg-gray-100 flex items-center justify-center transition-colors">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0F1C] flex flex-col p-6 relative overflow-hidden font-sans transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-100 flex flex-col p-6 relative overflow-hidden font-sans transition-colors">
       {/* Background styling */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-blue-900/10 rounded-full blur-[150px]"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-orange-900/10 rounded-full blur-[150px]"></div>
         <div className="absolute inset-0 bg-grid-pattern opacity-50 mix-blend-overlay"></div>
       </div>
 
       <header className="relative z-20 max-w-7xl mx-auto w-full mb-12">
-        <Link to="/" className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-2 mb-8 w-fit font-medium">
+        <Link to="/" className="text-gray-500 dark:text-gray-600 hover:text-slate-900 dark:hover:text-gray-900 transition flex items-center gap-2 mb-8 w-fit font-medium">
           <ArrowLeft size={18} />
           Back to Home
         </Link>
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">Verification Center</h1>
-        <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl">
-          Select a verification method below. Our multimodal engine powered by Gemini will analyze the content and detect any fabrications or misleading claims.
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-gray-900 mb-4">Verification Center</h1>
+        <p className="text-slate-600 dark:text-gray-600 text-lg max-w-2xl">
+          Select a verification method below. Our agentic engine powered by Groq Llama 3 will analyze the content and detect any fabrications or misleading claims.
         </p>
         {isGuest && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 inline-flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl px-4 py-2.5"
+            className="mt-4 inline-flex items-center gap-3 bg-amber-100 border border-amber-300 rounded-xl px-4 py-2.5"
           >
-            <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-            <span className="text-amber-700 dark:text-amber-300 text-sm">
+            <span className="w-2 h-2 bg-amber-600 rounded-full animate-pulse" />
+            <span className="text-amber-900 text-sm">
               You're in guest mode.{' '}
-              <Link to="/register" className="font-semibold underline underline-offset-2 hover:text-amber-900 dark:hover:text-amber-100 transition">Create an account</Link>
+              <Link to="/register" className="font-semibold underline underline-offset-2 hover:text-amber-700 transition">Create an account</Link>
               {' '}to save your verification history.
             </span>
           </motion.div>
@@ -184,14 +185,14 @@ export function VerifyPage() {
             className={`bg-white dark:bg-surface/80 backdrop-blur-xl border rounded-3xl p-8 flex flex-col shadow-xl transition-colors group ${
               activeTab === 'text'
                 ? 'border-primary/50 dark:border-primary/30 ring-1 ring-primary/20'
-                : 'border-slate-200 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600'
+                : 'border-slate-200 dark:border-gray-300/50 hover:border-slate-300 dark:hover:border-slate-600'
             }`}
           >
-            <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/40 rounded-2xl flex items-center justify-center mb-6 border border-blue-200 dark:border-blue-800/50 group-hover:bg-primary/20 transition-colors">
-              <FileText size={28} className="text-blue-600 dark:text-blue-400 group-hover:text-primary transition-colors" />
+            <div className="w-14 h-14 bg-blue-100 dark:bg-orange-900/40 rounded-2xl flex items-center justify-center mb-6 border border-blue-200 dark:border-blue-800/50 group-hover:bg-primary/20 transition-colors">
+              <FileText size={28} className="text-orange-600 dark:text-orange-400 group-hover:text-primary transition-colors" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Text Verifier</h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm mb-8 flex-1">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-gray-900 mb-3">Text Verifier</h2>
+            <p className="text-slate-600 dark:text-gray-600 text-sm mb-8 flex-1">
               Analyze claims, news snippets, or social media statements for factual accuracy.
             </p>
             
@@ -203,13 +204,13 @@ export function VerifyPage() {
                 onChange={(e) => { setTextInput(e.target.value); setActiveTab('text'); }}
                 onFocus={() => setActiveTab('text')}
                 disabled={isAnalyzing}
-                className="w-full h-32 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl p-4 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 placeholder-slate-400 dark:placeholder-slate-600 resize-none mb-6 text-sm disabled:opacity-50"
+                className="w-full h-32 bg-slate-50 dark:bg-white/50 border border-slate-200 dark:border-gray-300 text-slate-900 dark:text-gray-900 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 placeholder-slate-400 dark:placeholder-slate-600 resize-none mb-6 text-sm disabled:opacity-50"
               ></textarea>
               
               <button
                 type="submit"
                 disabled={isAnalyzing || !textInput.trim()}
-                className="w-full bg-slate-800 dark:bg-slate-800 text-white hover:bg-primary hover:text-black rounded-xl py-3 font-semibold transition-all duration-300 shadow-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gray-100 dark:bg-gray-100 text-gray-900 hover:bg-primary hover:text-black rounded-xl py-3 font-semibold transition-all duration-300 shadow-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isAnalyzing && activeTab === 'text' ? (
                   <>
@@ -231,21 +232,21 @@ export function VerifyPage() {
             className={`bg-white dark:bg-surface/80 backdrop-blur-xl border rounded-3xl p-8 flex flex-col shadow-xl transition-colors group ${
               activeTab === 'url'
                 ? 'border-primary/50 dark:border-primary/30 ring-1 ring-primary/20'
-                : 'border-slate-200 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600'
+                : 'border-slate-200 dark:border-gray-300/50 hover:border-slate-300 dark:hover:border-slate-600'
             }`}
           >
             <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/40 rounded-2xl flex items-center justify-center mb-6 border border-purple-200 dark:border-purple-800/50 group-hover:bg-primary/20 transition-colors">
-              <LinkIcon size={28} className="text-purple-600 dark:text-purple-400 group-hover:text-primary transition-colors" />
+              <LinkIcon size={28} className="text-amber-600 group-hover:text-primary transition-colors" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">URL Verifier</h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm mb-8 flex-1">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-gray-900 mb-3">URL Verifier</h2>
+            <p className="text-slate-600 dark:text-gray-600 text-sm mb-8 flex-1">
               Verify the content of entire webpages and articles by pasting the link.
             </p>
             
             <form onSubmit={handleUrlSubmit}>
               <div className="relative mb-6">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <LinkIcon size={16} className="text-slate-400" />
+                  <LinkIcon size={16} className="text-gray-600" />
                 </div>
                 <input 
                   id="verify-url-input"
@@ -255,14 +256,14 @@ export function VerifyPage() {
                   onChange={(e) => { setUrlInput(e.target.value); setActiveTab('url'); }}
                   onFocus={() => setActiveTab('url')}
                   disabled={isAnalyzing}
-                  className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl pl-11 pr-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 placeholder-slate-400 dark:placeholder-slate-600 text-sm disabled:opacity-50"
+                  className="w-full bg-slate-50 dark:bg-white/50 border border-slate-200 dark:border-gray-300 text-slate-900 dark:text-gray-900 rounded-xl pl-11 pr-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 placeholder-slate-400 dark:placeholder-slate-600 text-sm disabled:opacity-50"
                 />
               </div>
               
               <button
                 type="submit"
                 disabled={isAnalyzing || !urlInput.trim()}
-                className="w-full bg-slate-800 dark:bg-slate-800 text-white hover:bg-primary hover:text-black rounded-xl py-3 font-semibold transition-all duration-300 shadow-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] mt-auto disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gray-100 dark:bg-gray-100 text-gray-900 hover:bg-primary hover:text-black rounded-xl py-3 font-semibold transition-all duration-300 shadow-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] mt-auto disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isAnalyzing && activeTab === 'url' ? (
                   <>
@@ -284,7 +285,7 @@ export function VerifyPage() {
             className={`bg-white dark:bg-surface/80 backdrop-blur-xl border rounded-3xl p-8 flex flex-col shadow-xl transition-colors group relative overflow-hidden ${
               activeTab === 'image'
                 ? 'border-primary/50 dark:border-primary/30 ring-1 ring-primary/20'
-                : 'border-slate-200 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600'
+                : 'border-slate-200 dark:border-gray-300/50 hover:border-slate-300 dark:hover:border-slate-600'
             }`}
           >
             {/* Subtle highlight */}
@@ -293,20 +294,20 @@ export function VerifyPage() {
             <div className="w-14 h-14 bg-green-100 dark:bg-green-900/40 rounded-2xl flex items-center justify-center mb-6 border border-green-200 dark:border-green-800/50 group-hover:bg-primary/20 transition-colors">
               <ImageIcon size={28} className="text-green-600 dark:text-green-400 group-hover:text-primary transition-colors" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Image Verifier</h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm mb-8 flex-1">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-gray-900 mb-3">Image Verifier</h2>
+            <p className="text-slate-600 dark:text-gray-600 text-sm mb-8 flex-1">
               Detect manipulated visuals, AI generation, and synthetic fabrications.
             </p>
             
             <div
               onClick={() => setActiveTab('image')}
-              className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 rounded-2xl p-6 flex flex-col items-center justify-center mb-6 bg-slate-50 dark:bg-slate-900/30 transition-colors cursor-pointer group/drop"
+              className="border-2 border-dashed border-slate-300 dark:border-gray-300 hover:border-primary/50 dark:hover:border-primary/50 rounded-2xl p-6 flex flex-col items-center justify-center mb-6 bg-slate-50 dark:bg-white/30 transition-colors cursor-pointer group/drop"
             >
-              <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center mb-3 group-hover/drop:bg-primary/20 transition-colors">
-                <UploadCloud size={20} className="text-slate-500 dark:text-slate-400 group-hover/drop:text-primary" />
+              <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-gray-100 flex items-center justify-center mb-3 group-hover/drop:bg-primary/20 transition-colors">
+                <UploadCloud size={20} className="text-gray-500 dark:text-gray-600 group-hover/drop:text-primary" />
               </div>
-              <p className="text-slate-700 dark:text-slate-300 font-medium text-sm mb-1">Click or drag image to upload</p>
-              <p className="text-slate-500 text-xs">PNG, JPG or WEBP (max. 10MB)</p>
+              <p className="text-slate-700 dark:text-gray-700 font-medium text-sm mb-1">Click or drag image to upload</p>
+              <p className="text-gray-500 text-xs">PNG, JPG or WEBP (max. 10MB)</p>
             </div>
             
             <button
@@ -340,6 +341,21 @@ export function VerifyPage() {
           )}
         </AnimatePresence>
 
+        {/* ─── Loading Skeleton ──────────────────────── */}
+        <AnimatePresence>
+          {isAnalyzing && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 30 }}
+              transition={{ duration: 0.5 }}
+              className="mt-10"
+            >
+              <FraudDetectionLoading />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* ─── Analysis Results ──────────────────────── */}
         <AnimatePresence>
           {result && (
@@ -350,11 +366,11 @@ export function VerifyPage() {
               transition={{ duration: 0.5 }}
               className="mt-10"
             >
-              <div className="bg-white dark:bg-[#0F1423] rounded-[2rem] p-8 lg:p-10 border border-slate-200 dark:border-slate-800/50 shadow-2xl transition-colors">
+              <div className="bg-white dark:bg-white rounded-[2rem] p-8 lg:p-10 border border-slate-200 dark:border-gray-200/50 shadow-2xl transition-colors">
                 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-gray-900 flex items-center gap-3">
                     {result.isFraud ? (
                       <ShieldAlert size={28} className="text-red-500" />
                     ) : (
@@ -364,7 +380,7 @@ export function VerifyPage() {
                   </h2>
                   <button
                     onClick={() => setResult(null)}
-                    className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+                    className="text-gray-600 hover:text-slate-600 dark:hover:text-gray-900 transition p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-100"
                   >
                     <X size={20} />
                   </button>
@@ -373,15 +389,15 @@ export function VerifyPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   
                   {/* Risk Score */}
-                  <div className="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center">
-                    <h4 className="text-slate-500 dark:text-slate-400 font-medium mb-4 uppercase tracking-wide text-xs">Risk Score</h4>
+                  <div className="bg-slate-50 dark:bg-gray-100/30 rounded-2xl p-6 border border-slate-200 dark:border-gray-200 flex flex-col items-center justify-center text-center">
+                    <h4 className="text-gray-500 dark:text-gray-600 font-medium mb-4 uppercase tracking-wide text-xs">Risk Score</h4>
                     <div className="relative w-32 h-32 mb-4">
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                         <circle
                           cx="50" cy="50" r="40"
                           fill="transparent"
                           stroke="currentColor"
-                          className="text-slate-200 dark:text-slate-800"
+                          className="text-gray-800 dark:text-slate-800"
                           strokeWidth="8"
                         />
                         <motion.circle
@@ -405,14 +421,14 @@ export function VerifyPage() {
                         <span className={`font-mono text-3xl font-bold bg-gradient-to-r ${getRiskScoreColor(result.riskScore)} bg-clip-text text-transparent`}>
                           {result.riskScore}
                         </span>
-                        <span className="text-slate-500 text-xs">/100</span>
+                        <span className="text-gray-500 text-xs">/100</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Verdict */}
-                  <div className="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center">
-                    <h4 className="text-slate-500 dark:text-slate-400 font-medium mb-4 uppercase tracking-wide text-xs">Verdict</h4>
+                  <div className="bg-slate-50 dark:bg-gray-100/30 rounded-2xl p-6 border border-slate-200 dark:border-gray-200 flex flex-col items-center justify-center text-center">
+                    <h4 className="text-gray-500 dark:text-gray-600 font-medium mb-4 uppercase tracking-wide text-xs">Verdict</h4>
                     <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${result.isFraud ? 'bg-red-500/10' : 'bg-green-500/10'}`}>
                       {result.isFraud ? (
                         <AlertTriangle size={32} className="text-red-500" />
@@ -431,8 +447,8 @@ export function VerifyPage() {
                   </div>
 
                   {/* Flags */}
-                  <div className="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col">
-                    <h4 className="text-slate-500 dark:text-slate-400 font-medium mb-4 uppercase tracking-wide text-xs">Indicators Found</h4>
+                  <div className="bg-slate-50 dark:bg-gray-100/30 rounded-2xl p-6 border border-slate-200 dark:border-gray-200 flex flex-col">
+                    <h4 className="text-gray-500 dark:text-gray-600 font-medium mb-4 uppercase tracking-wide text-xs">Indicators Found</h4>
                     {result.flags.length > 0 ? (
                       <div className="space-y-2 flex-1 overflow-y-auto max-h-48 custom-scrollbar">
                         {result.flags.map((flag, i) => (
@@ -444,22 +460,22 @@ export function VerifyPage() {
                             className="flex items-start gap-2 text-sm"
                           >
                             <AlertCircle size={14} className="text-orange-500 mt-0.5 flex-shrink-0" />
-                            <span className="text-slate-700 dark:text-slate-300">{flag}</span>
+                            <span className="text-slate-700 dark:text-gray-700">{flag}</span>
                           </motion.div>
                         ))}
                       </div>
                     ) : (
                       <div className="flex-1 flex items-center justify-center">
-                        <p className="text-slate-500 text-sm text-center">No specific indicators detected</p>
+                        <p className="text-gray-500 text-sm text-center">No specific indicators detected</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* Analysis Summary */}
-                <div className="mt-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 transition-colors">
-                  <h4 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Analysis Summary</h4>
-                  <p className="text-slate-800 dark:text-slate-200 leading-relaxed">{result.analysisSummary}</p>
+                <div className="mt-6 bg-slate-50 dark:bg-white/50 rounded-2xl p-6 border border-slate-200 dark:border-gray-200 transition-colors">
+                  <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-600 uppercase tracking-wider mb-3">Analysis Summary</h4>
+                  <p className="text-slate-800 dark:text-gray-800 leading-relaxed">{result.analysisSummary}</p>
                 </div>
               </div>
             </motion.div>

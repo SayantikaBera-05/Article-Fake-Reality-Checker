@@ -6,8 +6,9 @@
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-f55036?style=for-the-badge&logo=groq&logoColor=white)
 
-**Verifi*** is a sophisticated, full-stack platform designed to combat the global epidemic of misinformation. Built on a modern microservices architecture, Verifi processes multimodal inputs—text, URLs, and images—to extract underlying claims, crawl the live web for evidence, and evaluate veracity using advanced AI models like **Google Gemini 1.5 Pro**.
+**Verifi*** is a sophisticated, full-stack platform designed to combat the global epidemic of misinformation. Built on a modern microservices architecture, Verifi processes multimodal inputs—text, URLs, and images—using an **Agentic AI Pipeline** powered by **Groq LPU (Llama 3)**, **Serper.dev**, and **Jina AI** to extract underlying claims, crawl the live web for evidence, and evaluate veracity.
 
 ---
 
@@ -15,9 +16,12 @@
 
 Verifi is engineered for scale and performance, divided into three core pillars:
 
-1.  **Frontend (The Command Center)**: A cinematic, dark-themed Single Page Application (SPA) built with React. It provides a premium user experience with smooth animations (Framer Motion) and responsive layouts (Tailwind CSS).
-2.  **API Gateway (The Orchestrator)**: A robust Node.js/Express service that manages the "brain" of the platform—handling user authentication (JWT & Google OAuth2), history persistence in MongoDB, transactional emails, and secure request routing.
-3.  **AI Engine (The Analyst)**: A high-performance Python/FastAPI microservice dedicated to computational intelligence. It handles complex claim extraction, automated web research, and deep semantic evaluation via the Gemini 1.5 API.
+1.  **Frontend (The Command Center)**: A cinematic, premium Single Page Application (SPA) built with React. It provides an exceptional user experience with smooth animations (Framer Motion) and responsive, glassmorphic layouts (Tailwind CSS).
+2.  **API Gateway (The Orchestrator)**: A robust Node.js/Express service that manages the "brain" of the platform—handling user authentication (JWT & Google OAuth2), history persistence in MongoDB Atlas, and secure request routing to the Python microservice.
+3.  **Agentic Python Engine (The Analyst)**: A high-performance Python/FastAPI microservice dedicated to computational intelligence. It employs an agentic pipeline:
+    *   **The Scout**: Uses Serper.dev to search the live web for context.
+    *   **The Reader**: Uses Jina AI Reader to scrape exact content from web pages.
+    *   **The Analyst**: Uses Groq (Llama 3.1 8B Instant) to process evidence and verify the claim in real-time.
 
 ---
 
@@ -27,7 +31,7 @@ Verifi is engineered for scale and performance, divided into three core pillars:
 | :--- | :--- |
 | **Frontend** | React 18+, Vite, TypeScript, Tailwind CSS, Framer Motion, Axios |
 | **API Gateway** | Node.js, Express, MongoDB (Mongoose), Passport.js, JWT, Nodemailer |
-| **AI Engine** | Python 3.10+, FastAPI, Uvicorn, Google Generative AI (Gemini), BeautifulSoup4 |
+| **Agentic Engine** | Python 3.10+, FastAPI, Uvicorn, Groq API (Llama 3), Serper API, Jina AI |
 
 ---
 
@@ -35,11 +39,11 @@ Verifi is engineered for scale and performance, divided into three core pillars:
 
 ```text
 Article-Fake-Reality-Checker/
-├── frontend/               # React SPA (Vite + TS)
+├── frontend/                 # React SPA (Vite + TS)
 ├── backend/
-│   ├── node-gateway/        # Node.js Express Service (Auth & Data)
-│   └── python-engine/          # Python FastAPI Service (ML & Research)
-└── README.md               # Project Master Documentation
+│   ├── node-gateway/         # Node.js Express Service (Auth, History, DB)
+│   └── python-engine/        # Python FastAPI Service (Agentic ML Pipeline)
+└── README.md                 # Project Master Documentation
 ```
 
 ---
@@ -50,7 +54,8 @@ Article-Fake-Reality-Checker/
 - **Node.js** (v18+) & **npm**
 - **Python** (v3.10+)
 - **MongoDB** (Local or Atlas Instance)
-- **Google Cloud API Key** (with Gemini 1.5 Pro enabled)
+- **Groq API Key**
+- **Serper.dev API Key**
 
 ### Step 1: Clone the Repository
 ```bash
@@ -58,18 +63,19 @@ git clone https://github.com/Joy-S-07/Article-Fake-Reality-Checker.git
 cd Article-Fake-Reality-Checker
 ```
 
-### Step 2: Setup AI Engine
+### Step 2: Setup Python Agentic Engine
 ```bash
-cd backend/ai-engine
+cd backend/python-engine
 python -m venv venv
 source venv/bin/activate  # Windows: .\venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+# Create .env based on the template below
+python run.py
 ```
 
-### Step 3: Setup API Gateway
+### Step 3: Setup Node.js API Gateway
 ```bash
-cd ../api-gateway
+cd backend/node-gateway
 npm install
 # Create .env based on the template below
 npm run dev
@@ -77,7 +83,7 @@ npm run dev
 
 ### Step 4: Setup Frontend
 ```bash
-cd ../../frontend
+cd frontend
 npm install
 # Create .env based on the template below
 npm run dev
@@ -89,9 +95,19 @@ npm run dev
 
 You will need to configure `.env` files in each service directory. Key variables include:
 
-- **Frontend**: `VITE_API_BASE_URL` (pointing to the Gateway).
-- **API Gateway**: `MONGO_URI`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `SMTP_USER`, `PYTHON_ENGINE_URL`.
-- **AI Engine**: `MODEL_API_KEY` (Gemini), `PORT`.
+### `frontend/.env`
+- `VITE_API_URL` (pointing to the Node Gateway, e.g., `http://localhost:5000/api/v1`)
+
+### `backend/node-gateway/.env`
+- `MONGO_URI`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `SMTP_USER`
+- `PYTHON_ENGINE_URL` (pointing to the FastAPI server, e.g., `http://127.0.0.1:8000`)
+- `CLIENT_URL` (pointing to the Frontend, e.g., `http://localhost:5173`)
+
+### `backend/python-engine/.env`
+- `PORT` (e.g., 8000)
+- `GROQ_API_KEY` (Required for Llama 3 Inference)
+- `SERPER_API_KEY` (Required for live web search)
+- `ALLOWED_ORIGINS` (e.g., `http://localhost:5000`)
 
 ---
 
@@ -99,10 +115,10 @@ You will need to configure `.env` files in each service directory. Key variables
 
 - 🌙 **Cinematic UI**: Premium dark/light mode with fluid interactions.
 - 🔐 **Secure Auth**: Multi-layered authentication via JWT and Google OAuth2.
-- 📸 **Multimodal Input**: Fact-check via direct text, article links, or image uploads.
-- ⚡ **Real-time Analysis**: Instantaneous claim extraction and veracity scoring.
-- 💾 **Evidence Repository**: Save verified reports to your personal dashboard.
-- 📊 **Analytics**: Visualize your verification history and global trends.
+- 🤖 **Agentic Fact-Checking**: A multi-agent AI pipeline using Groq LPU, Serper, and Jina AI for high-accuracy verification.
+- ⚡ **Real-time Streaming**: Instantaneous claim extraction and veracity scoring streamed to the client.
+- 💾 **Evidence Repository**: Save verified reports to your personal dashboard history.
+- 📚 **Developer Docs**: Built-in comprehensive documentation and architectural guides.
 
 ---
 

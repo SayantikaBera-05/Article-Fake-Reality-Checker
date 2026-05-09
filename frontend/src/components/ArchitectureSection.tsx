@@ -15,7 +15,7 @@ export function ArchitectureSection() {
     {
       icon: <Brain size={32} className="text-primary mb-4" />,
       title: "Claim Extraction",
-      desc: "Google Gemini 1.5 Pro instantly analyzes the input, scraping websites or interpreting images to extract the core factual claim being made.",
+      desc: "Our Analyst Agent powered by Groq Llama 3 instantly analyzes the input, utilizing evidence retrieved by the Scout to extract the core factual claim being made.",
     },
     {
       icon: <Search size={32} className="text-primary mb-4" />,
@@ -25,19 +25,19 @@ export function ArchitectureSection() {
     {
       icon: <ShieldCheck size={32} className="text-primary mb-4" />,
       title: "Veracity Scoring",
-      desc: "Gemini evaluates the extracted claim against the retrieved evidence, mapping contradictions to generate a strict JSON response containing a Veracity Label and Confidence Score.",
+      desc: "The Llama 3 model evaluates the extracted claim against the retrieved evidence, mapping contradictions to generate a strict JSON response containing a Veracity Label and Confidence Score.",
     }
   ];
 
   return (
-    <section className="py-32 bg-slate-50 dark:bg-[#0A0F1C] relative z-20 overflow-hidden transition-colors">
+    <section className="py-32 bg-slate-50 dark:bg-gray-100 relative z-20 overflow-hidden transition-colors">
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.3] mix-blend-overlay pointer-events-none z-0"></div>
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-bold text-center text-slate-900 dark:text-white mb-20 transition-colors"
+          className="text-4xl md:text-5xl font-bold text-center text-slate-900 dark:text-gray-900 mb-20 transition-colors"
         >
           The Verifi Pipeline
         </motion.h2>
@@ -52,13 +52,13 @@ export function ArchitectureSection() {
               initial={{ opacity: 0, y: 50 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-white dark:bg-surface border border-slate-200 dark:border-slate-800 rounded-2xl p-8 relative z-10 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-xl"
+              className="bg-white dark:bg-surface border border-slate-200 dark:border-gray-200 rounded-2xl p-8 relative z-10 hover:border-slate-300 dark:hover:border-gray-300 transition-colors shadow-xl"
             >
-              <div className="bg-slate-50 dark:bg-slate-900/50 w-16 h-16 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-800 mb-6 shadow-inner mx-auto lg:mx-0 transition-colors">
+              <div className="bg-orange-50 w-16 h-16 rounded-xl flex items-center justify-center border border-orange-100 mb-6 shadow-inner mx-auto lg:mx-0 transition-colors">
                 {step.icon}
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3 text-center lg:text-left transition-colors">{step.title}</h3>
-              <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm text-center lg:text-left transition-colors">{step.desc}</p>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3 text-center lg:text-left transition-colors">{step.title}</h3>
+              <p className="text-gray-600 leading-relaxed text-sm text-center lg:text-left transition-colors">{step.desc}</p>
             </motion.div>
           ))}
         </div>

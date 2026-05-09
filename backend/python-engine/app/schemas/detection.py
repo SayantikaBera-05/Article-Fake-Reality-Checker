@@ -62,6 +62,15 @@ class FraudDetectionRequest(BaseModel):
     }
 
 
+# ─── Source Reference ──────────────────────────────
+class SourceReference(BaseModel):
+    """A web source consulted during the RAG analysis pipeline."""
+
+    title: str = Field(..., description="Title of the source page")
+    url: str = Field(..., description="URL of the source")
+    snippet: str = Field("", description="Brief snippet from the search result")
+
+
 # ─── Response Schema ───────────────────────────────
 class FraudDetectionResponse(BaseModel):
     """Strict response schema returned to the Node gateway."""
@@ -84,6 +93,10 @@ class FraudDetectionResponse(BaseModel):
     analysisSummary: str = Field(
         ..., description="Human-readable summary of the analysis"
     )
+    sources: List[SourceReference] = Field(
+        default_factory=list,
+        description="Web sources consulted during the RAG analysis pipeline"
+    )
 
     model_config = {
         "json_schema_extra": {
@@ -97,6 +110,13 @@ class FraudDetectionResponse(BaseModel):
                         "Contradicts established scientific consensus",
                     ],
                     "analysisSummary": "The claim that NASA confirmed the Earth is flat is fabricated...",
+                    "sources": [
+                        {
+                            "title": "Reuters Fact Check",
+                            "url": "https://reuters.com/fact-check/...",
+                            "snippet": "This claim has been debunked...",
+                        }
+                    ],
                 }
             ]
         }

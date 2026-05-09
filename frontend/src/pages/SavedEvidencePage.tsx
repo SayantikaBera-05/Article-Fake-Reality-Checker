@@ -20,7 +20,7 @@ export function SavedEvidencePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0F1C] flex font-sans overflow-hidden transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-100 flex font-sans overflow-hidden transition-colors">
       
       {/* Mobile Menu Button */}
       <button 
@@ -31,9 +31,9 @@ export function SavedEvidencePage() {
       </button>
 
       {/* Sidebar */}
-      <aside className={`fixed md:sticky top-0 left-0 h-screen w-64 bg-white/80 dark:bg-surface/50 backdrop-blur-md border-r border-slate-200 dark:border-slate-800/50 flex flex-col transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <aside className={`fixed md:sticky top-0 left-0 h-screen w-64 bg-white/80 dark:bg-surface/50 backdrop-blur-md border-r border-slate-200 dark:border-gray-200/50 flex flex-col transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="p-8">
-          <Link to="/" className="text-slate-900 dark:text-white font-bold text-2xl tracking-tight transition-colors">Verifi*</Link>
+          <Link to="/" className="text-slate-900 dark:text-gray-900 font-bold text-2xl tracking-tight transition-colors">Verifi*</Link>
         </div>
         
         <nav className="flex-1 px-4 space-y-2">
@@ -41,7 +41,7 @@ export function SavedEvidencePage() {
             <Link 
               key={link.name} 
               to={link.to}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${link.active ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border-l-2 border-transparent'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${link.active ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'text-gray-600 hover:bg-gray-100/50 hover:text-gray-800 border-l-2 border-transparent'}`}
             >
               {link.icon}
               <span className="font-medium text-sm">{link.name}</span>
@@ -50,12 +50,12 @@ export function SavedEvidencePage() {
         </nav>
 
         <div className="p-4 mb-4">
-          <div className="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 text-center">
+          <div className="bg-white/80 rounded-2xl p-4 border border-gray-200 text-center">
             <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-3">
               <Zap size={20} />
             </div>
-            <p className="text-xs text-slate-400 mb-2">Upgrade to Pro for unlimited API credits.</p>
-            <button className="w-full text-xs font-bold bg-primary text-black py-2 rounded-lg hover:bg-cyan-400 transition shadow-[0_0_10px_rgba(0,240,255,0.2)]">Upgrade Now</button>
+            <p className="text-xs text-gray-600 mb-2">Upgrade to Pro for unlimited API credits.</p>
+            <button className="w-full text-xs font-bold bg-primary text-black py-2 rounded-lg hover:bg-orange-400 transition shadow-[0_0_10px_rgba(0,240,255,0.2)]">Upgrade Now</button>
           </div>
         </div>
       </aside>
@@ -66,8 +66,8 @@ export function SavedEvidencePage() {
 
         <div className="max-w-6xl mx-auto relative z-10 pt-4">
           <header className="mb-10">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">Saved Evidence</h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Your personal library of verified claims and sources.</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-gray-900 mb-2 transition-colors">Saved Evidence</h1>
+            <p className="text-gray-500 dark:text-gray-600 text-sm">Your personal library of verified claims and sources.</p>
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -77,20 +77,20 @@ export function SavedEvidencePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white dark:bg-surface border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xl relative group hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+                className="bg-white dark:bg-surface border border-slate-200 dark:border-gray-200 rounded-2xl p-6 shadow-xl relative group hover:border-slate-300 dark:hover:border-gray-300 transition-colors"
               >
                 <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-slate-900/50 rounded-xl border border-slate-800 text-primary">
+                  <div className="p-3 bg-white/50 rounded-xl border border-gray-200 text-primary">
                     <Bookmark size={20} />
                   </div>
                   <div className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide ${item.stance === 'Supports' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
                     {item.stance}
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 line-clamp-2 transition-colors">{item.title}</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-3 mb-4">{item.snippet}</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-gray-900 mb-2 line-clamp-2 transition-colors">{item.title}</h3>
+                <p className="text-gray-500 dark:text-gray-600 text-sm line-clamp-3 mb-4">{item.snippet}</p>
                 
-                <div className="flex justify-between items-center text-xs text-slate-400 dark:text-slate-500 mt-auto pt-4 border-t border-slate-200 dark:border-slate-800/50">
+                <div className="flex justify-between items-center text-xs text-gray-600 dark:text-gray-500 mt-auto pt-4 border-t border-slate-200 dark:border-gray-200/50">
                   <span>{item.date}</span>
                   <div className="flex gap-3">
                     <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition">

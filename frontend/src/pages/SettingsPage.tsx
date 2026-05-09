@@ -17,7 +17,7 @@ export function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0F1C] flex font-sans overflow-hidden transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-100 flex font-sans overflow-hidden transition-colors">
       
       <button 
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -27,9 +27,9 @@ export function SettingsPage() {
       </button>
 
       {/* Sidebar */}
-      <aside className={`fixed md:sticky top-0 left-0 h-screen w-64 bg-white/80 dark:bg-surface/50 backdrop-blur-md border-r border-slate-200 dark:border-slate-800/50 flex flex-col transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <aside className={`fixed md:sticky top-0 left-0 h-screen w-64 bg-white/80 dark:bg-surface/50 backdrop-blur-md border-r border-slate-200 dark:border-gray-200/50 flex flex-col transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="p-8">
-          <Link to="/" className="text-slate-900 dark:text-white font-bold text-2xl tracking-tight transition-colors">Verifi*</Link>
+          <Link to="/" className="text-slate-900 dark:text-gray-900 font-bold text-2xl tracking-tight transition-colors">Verifi*</Link>
         </div>
         
         <nav className="flex-1 px-4 space-y-2">
@@ -37,7 +37,7 @@ export function SettingsPage() {
             <Link 
               key={link.name} 
               to={link.to}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${link.active ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border-l-2 border-transparent'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${link.active ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'text-gray-600 hover:bg-gray-100/50 hover:text-gray-800 border-l-2 border-transparent'}`}
             >
               {link.icon}
               <span className="font-medium text-sm">{link.name}</span>
@@ -46,12 +46,12 @@ export function SettingsPage() {
         </nav>
 
         <div className="p-4 mb-4">
-          <div className="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 text-center">
+          <div className="bg-white/80 rounded-2xl p-4 border border-gray-200 text-center">
             <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-3">
               <Zap size={20} />
             </div>
-            <p className="text-xs text-slate-400 mb-2">Upgrade to Pro for unlimited API credits.</p>
-            <button className="w-full text-xs font-bold bg-primary text-black py-2 rounded-lg hover:bg-cyan-400 transition shadow-[0_0_10px_rgba(0,240,255,0.2)]">Upgrade Now</button>
+            <p className="text-xs text-gray-600 mb-2">Upgrade to Pro for unlimited API credits.</p>
+            <button className="w-full text-xs font-bold bg-primary text-black py-2 rounded-lg hover:bg-orange-400 transition shadow-[0_0_10px_rgba(0,240,255,0.2)]">Upgrade Now</button>
           </div>
         </div>
       </aside>
@@ -62,44 +62,44 @@ export function SettingsPage() {
 
         <div className="max-w-4xl mx-auto relative z-10 pt-4">
           <header className="mb-10">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">Account Settings</h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Manage your profile, preferences, and account security.</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-gray-900 mb-2 transition-colors">Account Settings</h1>
+            <p className="text-gray-500 dark:text-gray-600 text-sm">Manage your profile, preferences, and account security.</p>
           </header>
 
-          <div className="bg-white/80 dark:bg-surface/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl transition-colors">
+          <div className="bg-white/80 dark:bg-surface/80 backdrop-blur-xl border border-slate-200 dark:border-gray-200 rounded-3xl p-8 shadow-2xl transition-colors">
             
             {/* Profile Section */}
             <section className="mb-12">
               <div className="flex items-center gap-3 mb-6">
                 <User className="text-primary" size={24} />
-                <h2 className="text-xl font-semibold text-white">Profile Information</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
               </div>
               <div className="space-y-6 max-w-2xl">
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Full Name</label>
-                  <input type="text" defaultValue="Marcus Doe" className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition" />
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Full Name</label>
+                  <input type="text" defaultValue="Marcus Doe" className="w-full bg-white/50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Email Address</label>
-                  <input type="email" defaultValue="marcus@example.com" className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition" />
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Email Address</label>
+                  <input type="email" defaultValue="marcus@example.com" className="w-full bg-white/50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition" />
                 </div>
               </div>
             </section>
 
-            <hr className="border-slate-800/50 mb-12" />
+            <hr className="border-gray-200/50 mb-12" />
 
             {/* Preferences Section */}
             <section className="mb-12">
               <div className="flex items-center gap-3 mb-6">
                 <PaintBucket className="text-primary" size={24} />
-                <h2 className="text-xl font-semibold text-white">Preferences</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Preferences</h2>
               </div>
               
               <div className="space-y-6 max-w-2xl">
-                <div className="flex items-center justify-between p-4 bg-slate-900/30 rounded-xl border border-slate-800/50">
+                <div className="flex items-center justify-between p-4 bg-white/30 rounded-xl border border-gray-200/50">
                   <div>
-                    <h3 className="text-white font-medium mb-1">Dark Mode</h3>
-                    <p className="text-sm text-slate-400">Use the dark theme across the platform.</p>
+                    <h3 className="text-gray-900 font-medium mb-1">Dark Mode</h3>
+                    <p className="text-sm text-gray-600">Use the dark theme across the platform.</p>
                   </div>
                   <button 
                     onClick={toggleTheme}
@@ -113,10 +113,10 @@ export function SettingsPage() {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-slate-900/30 rounded-xl border border-slate-800/50">
+                <div className="flex items-center justify-between p-4 bg-white/30 rounded-xl border border-gray-200/50">
                   <div>
-                    <h3 className="text-white font-medium mb-1">Email Notifications</h3>
-                    <p className="text-sm text-slate-400">Receive alerts for completed batch verifications.</p>
+                    <h3 className="text-gray-900 font-medium mb-1">Email Notifications</h3>
+                    <p className="text-sm text-gray-600">Receive alerts for completed batch verifications.</p>
                   </div>
                   <button 
                     onClick={() => setEmailNotifs(!emailNotifs)}
@@ -132,8 +132,8 @@ export function SettingsPage() {
               </div>
             </section>
 
-            <div className="flex justify-end pt-6 border-t border-slate-800/50">
-              <button className="bg-primary text-black font-bold px-8 py-3 rounded-xl hover:bg-cyan-400 transition shadow-[0_0_20px_rgba(0,240,255,0.2)]">
+            <div className="flex justify-end pt-6 border-t border-gray-200/50">
+              <button className="bg-primary text-black font-bold px-8 py-3 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(0,240,255,0.2)]">
                 Save Changes
               </button>
             </div>

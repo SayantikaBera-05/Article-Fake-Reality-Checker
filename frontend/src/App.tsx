@@ -12,6 +12,7 @@ import { OAuthSuccessPage } from './pages/OAuthSuccessPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { DocumentationPage } from './pages/DocumentationPage';
 import { Footer } from './components';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
@@ -40,6 +41,8 @@ function App() {
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               {/* Profile */}
               <Route path="/profile" element={<ProfilePage />} />
+              {/* Documentation */}
+              <Route path="/docs" element={<DocumentationPage />} />
               {/* OAuth callback route — backend redirects here after Google sign-in */}
               <Route path="/oauth-success" element={<OAuthSuccessPage />} />
             </Routes>

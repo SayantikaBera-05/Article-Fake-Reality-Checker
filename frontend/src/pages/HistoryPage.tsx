@@ -36,7 +36,7 @@ export function HistoryPage() {
 
   const getVeracity = (item: FraudReport | VerificationHistoryEntry) => {
     const result = 'result' in item ? item.result : null;
-    if (!result) return { label: 'Unknown', color: 'text-slate-500', bg: 'bg-slate-500/10', icon: <ShieldCheck size={20} className="text-slate-500" />, confidence: 0 };
+    if (!result) return { label: 'Unknown', color: 'text-gray-500', bg: 'bg-slate-500/10', icon: <ShieldCheck size={20} className="text-gray-500" />, confidence: 0 };
 
     if (result.isFraud) {
       if (result.riskScore >= 80) return { label: 'False', color: 'text-red-500', bg: 'bg-red-500/10', icon: <AlertTriangle size={20} className="text-red-500" />, confidence: result.riskScore };
@@ -56,7 +56,7 @@ export function HistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0F1C] flex font-sans overflow-hidden transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-100 flex font-sans overflow-hidden transition-colors">
       
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px]"></div>
@@ -66,14 +66,14 @@ export function HistoryPage() {
       <div className="max-w-6xl mx-auto relative z-10 w-full p-6 lg:p-12">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <div>
-            <Link to="/dashboard" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-2 mb-4 text-sm font-medium">
+            <Link to="/dashboard" className="text-gray-600 hover:text-slate-900 dark:hover:text-gray-900 transition flex items-center gap-2 mb-4 text-sm font-medium">
               <ArrowLeft size={16} />
               Back to Dashboard
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-slate-400">
               Verification History
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-2">View your past fact-checking analyses.</p>
+            <p className="text-gray-500 dark:text-gray-600 mt-2">View your past fact-checking analyses.</p>
           </div>
         </header>
 
@@ -91,16 +91,16 @@ export function HistoryPage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-20 text-center"
           >
-            <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
-              <Inbox size={36} className="text-slate-400" />
+            <div className="w-20 h-20 bg-slate-100 dark:bg-gray-100 rounded-full flex items-center justify-center mb-6">
+              <Inbox size={36} className="text-gray-600" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No verifications yet</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 max-w-md">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-gray-900 mb-2">No verifications yet</h3>
+            <p className="text-gray-500 dark:text-gray-600 text-sm mb-6 max-w-md">
               Once you verify articles, claims, or URLs, they'll appear here.
             </p>
             <Link
               to="/verify"
-              className="px-6 py-3 bg-primary text-black rounded-xl font-bold hover:bg-cyan-400 transition shadow-[0_0_15px_rgba(0,240,255,0.2)]"
+              className="px-6 py-3 bg-primary text-black rounded-xl font-bold hover:bg-orange-400 transition shadow-[0_0_15px_rgba(0,240,255,0.2)]"
             >
               Start Verifying
             </Link>
@@ -119,32 +119,32 @@ export function HistoryPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="bg-white dark:bg-surface/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-3xl p-6 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-xl flex flex-col h-full group cursor-pointer"
+                  className="bg-white dark:bg-surface/80 backdrop-blur-md border border-slate-200 dark:border-gray-200 rounded-3xl p-6 hover:border-slate-300 dark:hover:border-gray-300 transition-colors shadow-xl flex flex-col h-full group cursor-pointer"
                 >
                   <div className="flex justify-between items-start mb-6">
-                    <div className={`px-4 py-1.5 rounded-full flex items-center gap-2 ${veracity.bg} border border-slate-200 dark:border-slate-700/50`}>
+                    <div className={`px-4 py-1.5 rounded-full flex items-center gap-2 ${veracity.bg} border border-slate-200 dark:border-gray-300/50`}>
                       {veracity.icon}
                       <span className={`text-xs font-bold uppercase tracking-wider ${veracity.color}`}>{veracity.label}</span>
                     </div>
                     
-                    <div className="flex items-center gap-1.5 text-slate-500 text-sm">
+                    <div className="flex items-center gap-1.5 text-gray-500 text-sm">
                       <Calendar size={14} />
                       <span>{date}</span>
                     </div>
                   </div>
                   
-                  <h3 className="text-lg text-slate-900 dark:text-slate-200 font-medium mb-8 flex-1 leading-relaxed group-hover:text-primary transition-colors line-clamp-3">
+                  <h3 className="text-lg text-slate-900 dark:text-gray-800 font-medium mb-8 flex-1 leading-relaxed group-hover:text-primary transition-colors line-clamp-3">
                     "{claim}"
                   </h3>
                   
-                  <div className="flex justify-between items-end mt-auto pt-6 border-t border-slate-200 dark:border-slate-800 transition-colors">
+                  <div className="flex justify-between items-end mt-auto pt-6 border-t border-slate-200 dark:border-gray-200 transition-colors">
                     <div className="flex flex-col">
-                      <span className="text-slate-500 text-xs uppercase tracking-wider font-semibold mb-1">Confidence</span>
+                      <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold mb-1">Confidence</span>
                       <div className="flex items-center gap-3">
-                        <div className="w-24 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div className="w-24 h-1.5 bg-slate-200 dark:bg-gray-100 rounded-full overflow-hidden">
                           <div className="h-full bg-primary rounded-full" style={{ width: `${veracity.confidence}%` }}></div>
                         </div>
-                        <span className="font-mono text-slate-900 dark:text-white text-sm font-bold transition-colors">{veracity.confidence}%</span>
+                        <span className="font-mono text-slate-900 dark:text-gray-900 text-sm font-bold transition-colors">{veracity.confidence}%</span>
                       </div>
                     </div>
                     

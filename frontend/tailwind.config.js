@@ -8,9 +8,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#00F0FF',
-        surface: '#121826',
-        background: '#0A0F1C',
+        primary: '#F4C430', // Saffron orange
+        surface: '#FFFFFF',
+        background: '#F9FAFB',
       },
       fontFamily: {
         sans: ['"Inter"', 'sans-serif'],

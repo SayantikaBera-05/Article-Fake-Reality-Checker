@@ -81,14 +81,14 @@ export function RegisterPage() {
   // Don't render while auth is hydrating
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#0A0F1C] relative">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100 relative">
       {/* Global grid pattern overlay */}
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.5] mix-blend-overlay pointer-events-none z-0"></div>
       
@@ -96,10 +96,10 @@ export function RegisterPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md bg-surface/80 backdrop-blur-md border border-slate-700/50 rounded-3xl p-8 shadow-2xl relative z-10"
+        className="w-full max-w-md bg-surface/80 backdrop-blur-md border border-gray-300/50 rounded-3xl p-8 shadow-2xl relative z-10"
       >
-        <h1 className="text-white text-3xl font-bold mb-2 text-center">Create an Account</h1>
-        <p className="text-slate-400 text-sm text-center mb-8">Join Verifi to start fact-checking realities.</p>
+        <h1 className="text-gray-900 text-3xl font-bold mb-2 text-center">Create an Account</h1>
+        <p className="text-gray-600 text-sm text-center mb-8">Join Verifi to start fact-checking realities.</p>
 
         {/* Error Banner */}
         {error && (
@@ -115,7 +115,7 @@ export function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
             <input 
               id="register-name"
               type="text" 
@@ -124,12 +124,12 @@ export function RegisterPage() {
               onChange={(e) => setName(e.target.value)}
               disabled={isSubmitting}
               autoComplete="name"
-              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
+              className="w-full bg-gray-100/50 border border-gray-300/50 rounded-xl pl-12 pr-4 py-3 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
             />
           </div>
 
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
             <input 
               id="register-email"
               type="email" 
@@ -138,12 +138,12 @@ export function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={isSubmitting}
               autoComplete="email"
-              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
+              className="w-full bg-gray-100/50 border border-gray-300/50 rounded-xl pl-12 pr-4 py-3 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
             />
           </div>
 
           <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
             <input 
               id="register-password"
               type="password" 
@@ -152,12 +152,12 @@ export function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               disabled={isSubmitting}
               autoComplete="new-password"
-              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
+              className="w-full bg-gray-100/50 border border-gray-300/50 rounded-xl pl-12 pr-4 py-3 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
             />
           </div>
 
           <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
             <input 
               id="register-confirm-password"
               type="password" 
@@ -166,14 +166,14 @@ export function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={isSubmitting}
               autoComplete="new-password"
-              className="w-full bg-[#0A0F1C]/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
+              className="w-full bg-gray-100/50 border border-gray-300/50 rounded-xl pl-12 pr-4 py-3 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all disabled:opacity-50"
             />
           </div>
 
           <button 
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#00F0FF] text-black font-semibold rounded-full py-3 mt-6 hover:bg-cyan-400 transition-colors shadow-[0_0_15px_rgba(0,240,255,0.2)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#00F0FF] text-black font-semibold rounded-full py-3 mt-6 hover:bg-orange-400 transition-colors shadow-[0_0_15px_rgba(0,240,255,0.2)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
@@ -187,16 +187,16 @@ export function RegisterPage() {
         </form>
 
         <div className="flex items-center gap-4 mt-6 mb-6">
-          <div className="h-px bg-slate-800 flex-1"></div>
-          <span className="text-slate-500 text-xs uppercase tracking-wider font-medium">Or continue with</span>
-          <div className="h-px bg-slate-800 flex-1"></div>
+          <div className="h-px bg-gray-100 flex-1"></div>
+          <span className="text-gray-500 text-xs uppercase tracking-wider font-medium">Or continue with</span>
+          <div className="h-px bg-gray-100 flex-1"></div>
         </div>
 
         <button 
           type="button"
           onClick={handleGoogleSignUp}
           disabled={isSubmitting}
-          className="w-full bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-full py-3 flex items-center justify-center gap-2 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-white/5 backdrop-blur-sm border border-white/10 text-gray-900 rounded-full py-3 flex items-center justify-center gap-2 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -207,7 +207,7 @@ export function RegisterPage() {
           Continue with Google
         </button>
 
-        <div className="mt-8 text-center text-slate-400 text-sm">
+        <div className="mt-8 text-center text-gray-600 text-sm">
           Already have an account? <Link to="/login" className="text-[#00F0FF] hover:underline font-medium">Sign In</Link>
         </div>
       </motion.div>

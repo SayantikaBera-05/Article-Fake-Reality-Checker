@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from './Navbar';
+import { useAuth } from '../context/AuthContext';
 
 export function HeroSection() {
+  const { isAuthenticated } = useAuth();
   const phrase = "Verifi: Where you verify realities.".split(" ");
   const titleText = "Verifi*".split("");
   
@@ -12,21 +14,26 @@ export function HeroSection() {
   const particles = Array.from({ length: 20 });
 
   return (
-    <section className="relative min-h-screen flex flex-col p-6 overflow-hidden bg-[#0A0F1C]">
+    <section className="relative min-h-screen flex flex-col p-6 overflow-hidden bg-gray-100">
       {/* Background Video */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-60 mix-blend-screen"
-        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4"
+        className="fixed inset-0 w-full h-full object-cover z-0"
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260406_094145_4a271a6c-3869-4f1c-8aa7-aeb0cb227994.mp4"
       />
       
-      {/* Overlays: Grid and Noise */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/80 z-10"></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1C] via-transparent to-black/30 z-10"></div>
-      <div className="absolute inset-0 bg-grid-pattern opacity-[0.5] mix-blend-overlay pointer-events-none z-10"></div>
+      {/* Bottom Blur Overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none backdrop-blur-xl" 
+        style={{ 
+          WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 45%)', 
+          maskImage: 'linear-gradient(to top, black 0%, transparent 45%)',
+          zIndex: 1 
+        }}
+      ></div>
 
       {/* Floating data particles */}
       {particles.map((_, i) => (
@@ -51,73 +58,65 @@ export function HeroSection() {
       ))}
       
       {/* Navbar */}
-      <Navbar />
+      <Navbar isDarkBg={true} />
 
       {/* Hero Content Left (Command Aesthetic) */}
       <div className="relative z-30 flex-1 flex flex-col items-start justify-center w-full mt-16 text-left max-w-7xl mx-auto px-4 md:px-12">
         
         {/* Title and Button Container */}
         <div className="flex items-center justify-between w-full relative z-20 mb-4">
-          <h1 className="text-7xl md:text-9xl font-bold tracking-tight text-slate-900 dark:text-white flex overflow-hidden">
+          <h1 className="text-7xl md:text-9xl font-bold tracking-tight text-white flex overflow-hidden">
             {titleText.map((letter, i) => (
-              <motion.span
+              <span
                 key={i}
-                initial={{ y: 100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 + i * 0.1, duration: 0.8, type: 'spring', stiffness: 100 }}
-                className="inline-block"
+                className="inline-block animate-blur-fade-up"
+                style={{ animationDelay: `${0.1 + i * 0.1}s` }}
               >
                 {letter}
-              </motion.span>
+              </span>
             ))}
           </h1>
 
           {/* Call to Action Buttons (Right aligned in Flexbox) */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1, duration: 0.8 }}
-            className="hidden md:flex flex-col items-center w-full max-w-xs gap-3 mt-6 ml-auto"
+          <div
+            className="hidden md:flex flex-col items-center w-full max-w-xs gap-3 mt-6 ml-auto animate-blur-fade-up"
+            style={{ animationDelay: '0.8s' }}
           >
             <Link 
               to="/verify" 
-              className="w-full bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)] text-white hover:bg-white/20 transition-all duration-300 rounded-full px-8 py-3 font-medium text-center flex items-center justify-center gap-2"
+              className="w-full liquid-glass text-white hover:bg-white/20 transition-all duration-300 rounded-full px-8 py-3 font-medium text-center flex items-center justify-center gap-2"
             >
               Get Started for free
               <ArrowRight size={20} />
             </Link>
             
-            <span className="text-slate-500 text-sm font-medium">Or</span>
+            <span className="text-slate-300 text-sm font-medium">Or</span>
             
             <Link 
-              to="/login" 
-              className="w-full bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)] text-white hover:bg-white/20 transition-all duration-300 rounded-full px-8 py-3 font-medium text-center block flex items-center justify-center gap-2"
+              to={isAuthenticated ? "/dashboard" : "/login"} 
+              className="w-full liquid-glass text-white hover:bg-white/20 transition-all duration-300 rounded-full px-8 py-3 font-medium text-center block flex items-center justify-center gap-2"
             >
-              Login to your Account <ArrowRight size={20} />
+              {isAuthenticated ? "My Account" : "Login to your Account"} <ArrowRight size={20} />
             </Link>
-          </motion.div>
+          </div>
         </div>
 
         {/* Settling phrase - Left Aligned below heading */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 1 }}
-          className="flex space-x-2 text-xl md:text-2xl font-medium text-primary mb-6 justify-start w-full"
+        <div 
+          className="flex space-x-2 text-xl md:text-2xl font-medium text-primary mb-6 justify-start w-full animate-blur-fade-up drop-shadow-md"
+          style={{ animationDelay: '0.9s' }}
         >
           {phrase.map((word, i) => (
             <span key={i}>{word}</span>
           ))}
-        </motion.div>
+        </div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-xl mb-8"
+        <p
+          className="text-lg md:text-xl text-slate-200 max-w-xl mb-8 animate-blur-fade-up drop-shadow-md"
+          style={{ animationDelay: '1.0s' }}
         >
-          Real-time fact-checking powered by Google Gemini. Paste a claim, URL, or image to uncover the truth.
-        </motion.p>
+          Real-time fact-checking powered by Groq LPU & Agentic AI. Paste a claim, URL, or image to uncover the truth.
+        </p>
       </div>
     </section>
   );
