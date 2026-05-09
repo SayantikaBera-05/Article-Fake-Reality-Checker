@@ -107,6 +107,7 @@ You will need to configure `.env` files in each service directory. Key variables
 - `PORT` (e.g., 8000)
 - `GROQ_API_KEY` (Required for Llama 3 Inference)
 - `SERPER_API_KEY` (Required for live web search)
+-  `JINA AI` (Required for live check)
 - `ALLOWED_ORIGINS` (e.g., `http://localhost:5000`)
 
 ---
