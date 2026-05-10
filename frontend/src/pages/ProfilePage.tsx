@@ -108,16 +108,16 @@ export function ProfilePage() {
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-900/5 rounded-full blur-[150px]" />
       </div>
 
-      <div className="relative z-10 max-w-3xl mx-auto px-4 py-16">
+      <div className="relative z-10 max-w-3xl mx-auto px-4 py-8 sm:py-16">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <Link to="/dashboard" className="text-gray-600 hover:text-slate-900 dark:hover:text-gray-900 transition flex items-center gap-2 mb-4 text-sm font-medium w-fit">
             <ArrowLeft size={16} />
             Back to Dashboard
           </Link>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-gray-900 mb-1">Profile Settings</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-gray-900 mb-1">Profile Settings</h1>
               <p className="text-gray-500 dark:text-gray-600 text-sm">Manage your account information and security settings.</p>
             </div>
             <button
@@ -149,15 +149,15 @@ export function ProfilePage() {
 
         {/* Profile Card */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="bg-white/80 /80 backdrop-blur-xl border border-slate-200 dark:border-gray-200/50 rounded-2xl p-6 md:p-8 mb-6 shadow-lg">
-          <div className="flex items-start justify-between mb-6">
+          className="bg-white/80 /80 backdrop-blur-xl border border-slate-200 dark:border-gray-200/50 rounded-2xl p-5 sm:p-6 md:p-8 mb-6 shadow-lg">
+          <div className="flex flex-col sm:flex-row items-start justify-between mb-6 gap-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-gray-900 text-2xl font-bold shadow-lg">
                 {u?.name?.charAt(0)?.toUpperCase() || 'U'}
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-gray-900">{u?.name}</h2>
-                <p className="text-gray-500 dark:text-gray-600 text-sm flex items-center gap-1.5">
+                <p className="text-gray-500 dark:text-gray-600 text-sm flex items-center gap-1.5 flex-wrap break-all">
                   <Mail size={14} /> {u?.email}
                   {u?.isEmailVerified && <span className="text-green-500 ml-1 flex items-center gap-0.5 text-xs"><CheckCircle2 size={12} /> Verified</span>}
                 </p>

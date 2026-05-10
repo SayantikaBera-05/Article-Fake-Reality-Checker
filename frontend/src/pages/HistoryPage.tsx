@@ -63,14 +63,14 @@ export function HistoryPage() {
         <div className="absolute inset-0 bg-grid-pattern opacity-50 mix-blend-overlay"></div>
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10 w-full p-6 lg:p-12">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+      <div className="max-w-6xl mx-auto relative z-10 w-full p-4 sm:p-6 lg:p-12">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 sm:mb-12 gap-4 sm:gap-6">
           <div>
             <Link to="/dashboard" className="text-gray-600 hover:text-slate-900 dark:hover:text-gray-900 transition flex items-center gap-2 mb-4 text-sm font-medium">
               <ArrowLeft size={16} />
               Back to Dashboard
             </Link>
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-slate-400">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-slate-400">
               Verification History
             </h1>
             <p className="text-gray-500 dark:text-gray-600 mt-2">View your past fact-checking analyses.</p>

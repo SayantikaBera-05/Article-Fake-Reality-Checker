@@ -8,7 +8,7 @@ export function HowItWorksPage() {
     <div className="min-h-screen bg-slate-50 font-sans transition-colors">
       <Navbar />
       
-      <div className="pt-32 pb-24 px-4 sm:px-6 max-w-3xl mx-auto">
+      <div className="pt-28 sm:pt-32 pb-16 sm:pb-24 px-4 sm:px-6 max-w-3xl mx-auto">
         <motion.article 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -21,7 +21,7 @@ export function HowItWorksPage() {
               <HelpCircle size={20} />
               <span>Behind the Scenes</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6 text-center md:text-left">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6 text-center md:text-left">
               How We Spot Fake News (in simple terms)
             </h1>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-slate-500 text-sm">
@@ -107,7 +107,7 @@ export function HowItWorksPage() {
               By forcing our AI to act as a Scout and Reader <em>first</em>, we ensure it only makes judgments based on cold, hard, real-time facts pulled directly from the live internet.
             </p>
 
-            <div className="mt-12 p-8 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl text-center not-prose">
+            <div className="mt-12 p-6 sm:p-8 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl text-center not-prose">
               <Globe className="text-cyan-400 mx-auto mb-4" size={40} />
               <h3 className="text-2xl font-bold text-white mb-4">Ready to try it yourself?</h3>
               <p className="text-slate-300 mb-8 max-w-md mx-auto">

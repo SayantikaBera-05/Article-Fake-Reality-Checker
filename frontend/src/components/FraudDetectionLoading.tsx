@@ -36,7 +36,7 @@ export function FraudDetectionLoading() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white/90 dark:bg-white/90 backdrop-blur-xl border border-gray-300/50 dark:border-gray-300 p-8 rounded-2xl shadow-2xl max-w-lg w-full pointer-events-auto shadow-orange-900/20"
+            className="bg-white/90 dark:bg-white/90 backdrop-blur-xl border border-gray-300/50 dark:border-gray-300 p-5 sm:p-8 rounded-2xl shadow-2xl max-w-lg w-[90%] sm:w-full pointer-events-auto shadow-orange-900/20"
           >
             <div className="flex items-center gap-3 mb-6 border-b border-gray-300/50 pb-4">
                <ShieldAlert className="text-orange-500" size={24} />
@@ -83,7 +83,7 @@ export function FraudDetectionLoading() {
         </div>
 
         {/* Skeleton Layout */}
-        <div className="bg-white rounded-2xl p-6 lg:p-8 border border-gray-200 shadow-2xl opacity-50 select-none max-w-6xl mx-auto mt-8">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-2xl opacity-50 select-none max-w-6xl mx-auto mt-8">
            
            {/* Header Skeleton */}
            <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200/60">
