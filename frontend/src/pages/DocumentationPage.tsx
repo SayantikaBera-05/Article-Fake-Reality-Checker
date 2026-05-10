@@ -105,19 +105,19 @@ export function DocumentationPage() {
               <BookOpen size={20} />
               <span>Developer Journal & Architecture</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6">
               Building Verifi*: The Technical Blueprint
             </h1>
-            <div className="flex items-center gap-4 text-slate-500 text-sm">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-slate-500 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold">
                   <Cpu size={16} />
                 </div>
                 <span className="font-medium text-slate-700">Verifi Systems Engineering</span>
               </div>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <time>May 2026</time>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span>15 min read</span>
             </div>
           </header>
@@ -130,8 +130,9 @@ export function DocumentationPage() {
           </div>
 
           {/* Complex Architecture Animation Flow (Moved from HowItWorks) */}
-          <div className="mb-20 overflow-x-auto no-scrollbar pb-8 w-full">
-            <h2 className="text-xl font-bold text-slate-400 mb-6 uppercase tracking-widest text-center text-sm">Network Topology & Data Flow</h2>
+          <div className="mb-20 overflow-x-auto no-scrollbar pb-8 w-full -mx-2 px-2">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-400 mb-6 uppercase tracking-widest text-center text-xs sm:text-sm">Network Topology & Data Flow</h2>
+            <p className="text-center text-slate-400 text-xs mb-4 sm:hidden">← Scroll horizontally to explore →</p>
             
             <div className="relative min-w-[1000px] w-full mx-auto p-10 bg-white rounded-[2.5rem] shadow-xl border border-slate-200">
               {/* Background Grid */}
