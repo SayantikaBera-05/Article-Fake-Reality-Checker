@@ -4,7 +4,7 @@ import { createHistoryEntry } from "../services/history.service.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
-const PYTHON_ENGINE_URL = process.env.PYTHON_ENGINE_URL || "http://localhost:8000";
+const PYTHON_ENGINE_URL = process.env.PYTHON_ENGINE_URL;
 
 // ─── Submit Fraud Check ────────────────────────────
 // Supports both authenticated users and guests (via optionalAuth middleware).
