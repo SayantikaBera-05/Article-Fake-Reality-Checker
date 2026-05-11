@@ -298,7 +298,7 @@ class Analyst:
                 {"role": "user", "content": prompt},
             ],
             temperature=self.temperature,
-            max_tokens=2048,
+            max_tokens=1024,
             top_p=0.95,
             stream=True,
         )
