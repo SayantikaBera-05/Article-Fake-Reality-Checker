@@ -5,6 +5,7 @@
 
 <img width="1904" height="980" alt="Recording 2026-05-12 195525" src="https://github.com/user-attachments/assets/f38752f9-1b7c-409d-8969-6dfc4e7947f5" />
 
+<<<<<<< HEAD
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -14,6 +15,17 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Serper.dev](https://img.shields.io/badge/Serper.dev-000000?style=for-the-badge&logo=google&logoColor=white)
 ![Jina AI](https://img.shields.io/badge/Jina_AI-008585?style=for-the-badge&logoColor=white)
+=======
+<br>
+
+<p align="center">
+  <a href="https://react.dev/" target="_blank"><img src="./assets/logos/react.svg" alt="React" width="40" height="40" /></a> &nbsp;
+  <a href="https://nodejs.org/" target="_blank"><img src="./assets/logos/nodejs.svg" alt="Node.js" width="40" height="40" /></a> &nbsp;
+  <a href="https://www.python.org/" target="_blank"><img src="./assets/logos/python.svg" alt="Python" width="40" height="40" /></a> &nbsp;
+  <a href="https://www.mongodb.com/" target="_blank"><img src="./assets/logos/mongodb.svg" alt="MongoDB" width="40" height="40" /></a> &nbsp;
+  <a href="https://tailwindcss.com/" target="_blank"><img src="./assets/logos/tailwindcss.svg" alt="Tailwind CSS" width="40" height="40" /></a> &nbsp;
+</p>
+>>>>>>> 5b34a1e724bd9119a95999f0c269d8aaf5d60ce2
 
 **Verifi*** is a sophisticated, full-stack platform designed to combat the global epidemic of misinformation. Built on a modern microservices architecture, Verifi processes multimodal inputs—text, URLs, and images—using an **Agentic AI Pipeline** powered by **OpenRouter (Llama 3)**, **Serper.dev**, and **Jina AI** to extract underlying claims, crawl the live web for evidence, and evaluate veracity.
 
