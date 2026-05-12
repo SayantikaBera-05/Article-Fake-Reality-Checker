@@ -1,14 +1,20 @@
 # Verifi* — Multimodal AI Fact-Checking Platform
 > **Where you verify realities.**
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Groq](https://img.shields.io/badge/Groq-f55036?style=for-the-badge&logo=groq&logoColor=white)
+<img width="1904" height="975" alt="image" src="https://github.com/user-attachments/assets/905efc38-c9ee-40d7-885b-8c2ef162bafc" />
 
-**Verifi*** is a sophisticated, full-stack platform designed to combat the global epidemic of misinformation. Built on a modern microservices architecture, Verifi processes multimodal inputs—text, URLs, and images—using an **Agentic AI Pipeline** powered by **Groq LPU (Llama 3)**, **Serper.dev**, and **Jina AI** to extract underlying claims, crawl the live web for evidence, and evaluate veracity.
+<br>
+
+<p align="center">
+  <img src="./assets/logos/react.svg" alt="React" width="40" height="40" /> &nbsp;
+  <img src="./assets/logos/nodejs.svg" alt="Node.js" width="40" height="40" /> &nbsp;
+  <img src="./assets/logos/python.svg" alt="Python" width="40" height="40" /> &nbsp;
+  <img src="./assets/logos/mongodb.svg" alt="MongoDB" width="40" height="40" /> &nbsp;
+  <img src="./assets/logos/tailwindcss.svg" alt="Tailwind CSS" width="40" height="40" /> &nbsp;
+  <img src="./assets/logos/openrouter.svg" alt="OpenRouter" width="40" height="40" />
+</p>
+
+**Verifi*** is a sophisticated, full-stack platform designed to combat the global epidemic of misinformation. Built on a modern microservices architecture, Verifi processes multimodal inputs—text, URLs, and images—using an **Agentic AI Pipeline** powered by **OpenRouter (Llama 3)**, **Serper.dev**, and **Jina AI** to extract underlying claims, crawl the live web for evidence, and evaluate veracity.
 
 ---
 
@@ -21,7 +27,7 @@ Verifi is engineered for scale and performance, divided into three core pillars:
 3.  **Agentic Python Engine (The Analyst)**: A high-performance Python/FastAPI microservice dedicated to computational intelligence. It employs an agentic pipeline:
     *   **The Scout**: Uses Serper.dev to search the live web for context.
     *   **The Reader**: Uses Jina AI Reader to scrape exact content from web pages.
-    *   **The Analyst**: Uses Groq (Llama 3.1 8B Instant) to process evidence and verify the claim in real-time.
+    *   **The Analyst**: Uses OpenRouter (Llama 3.1 8B Instant) to process evidence and verify the claim in real-time.
 
 ---
 
@@ -31,7 +37,7 @@ Verifi is engineered for scale and performance, divided into three core pillars:
 | :--- | :--- |
 | **Frontend** | React 18+, Vite, TypeScript, Tailwind CSS, Framer Motion, Axios |
 | **API Gateway** | Node.js, Express, MongoDB (Mongoose), Passport.js, JWT, Nodemailer |
-| **Agentic Engine** | Python 3.10+, FastAPI, Uvicorn, Groq API (Llama 3), Serper API, Jina AI |
+| **Agentic Engine** | Python 3.10+, FastAPI, Uvicorn, OpenRouter API (Llama 3), Serper API, Jina AI |
 
 ---
 
@@ -54,7 +60,7 @@ Article-Fake-Reality-Checker/
 - **Node.js** (v18+) & **npm**
 - **Python** (v3.10+)
 - **MongoDB** (Local or Atlas Instance)
-- **Groq API Key**
+- **OpenRouter API Key**
 - **Serper.dev API Key**
 
 ### Step 1: Clone the Repository
@@ -105,7 +111,7 @@ You will need to configure `.env` files in each service directory. Key variables
 
 ### `backend/python-engine/.env`
 - `PORT` (e.g., 8000)
-- `GROQ_API_KEY` (Required for Llama 3 Inference)
+- `OPENROUTER_API_KEY` (Required for Llama 3 Inference)
 - `SERPER_API_KEY` (Required for live web search)
 -  `JINA AI` (Required for live check)
 - `ALLOWED_ORIGINS` (e.g., `http://localhost:5000`)
@@ -116,7 +122,7 @@ You will need to configure `.env` files in each service directory. Key variables
 
 - 🌙 **Cinematic UI**: Premium dark/light mode with fluid interactions.
 - 🔐 **Secure Auth**: Multi-layered authentication via JWT and Google OAuth2.
-- 🤖 **Agentic Fact-Checking**: A multi-agent AI pipeline using Groq LPU, Serper, and Jina AI for high-accuracy verification.
+- 🤖 **Agentic Fact-Checking**: A multi-agent AI pipeline using OpenRouter, Serper, and Jina AI for high-accuracy verification.
 - ⚡ **Real-time Streaming**: Instantaneous claim extraction and veracity scoring streamed to the client.
 - 💾 **Evidence Repository**: Save verified reports to your personal dashboard history.
 - 📚 **Developer Docs**: Built-in comprehensive documentation and architectural guides.
