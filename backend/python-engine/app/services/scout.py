@@ -45,21 +45,104 @@ class Scout:
         results = await scout.search("NASA confirmed the Earth is flat")
     """
 
+    # NewsAPI.org endpoint for news-first verification
+    NEWSAPI_ENDPOINT: str = "https://newsapi.org/v2/everything"
+
     def __init__(self):
-        """Initialize the Scout with Serper configuration."""
+        """Initialize the Scout with Serper + NewsAPI configuration."""
         self.api_key: Optional[str] = settings.SERPER_API_KEY
+        self.news_api_key: Optional[str] = settings.NEWS_API
         self.endpoint: str = settings.SERPER_ENDPOINT
         self.num_results: int = settings.SERPER_NUM_RESULTS
 
         if self.api_key:
             print(f"[SCOUT] Serper.dev agent initialized (top {self.num_results} results)")
         else:
-            print("[SCOUT] WARNING: No SERPER_API_KEY -- search stage will be skipped")
+            print("[SCOUT] WARNING: No SERPER_API_KEY -- web search will be skipped")
+
+        if self.news_api_key:
+            print("[SCOUT] NewsAPI.org agent initialized for news-first verification")
+        else:
+            print("[SCOUT] WARNING: No NEWS_API key -- news search will be skipped")
 
     @property
     def is_available(self) -> bool:
-        """Check if the Scout has a valid API key configured."""
+        """Check if the Scout has a valid Serper API key configured."""
         return bool(self.api_key)
+
+    @property
+    def is_news_available(self) -> bool:
+        """Check if the Scout has a valid NewsAPI key configured."""
+        return bool(self.news_api_key)
+
+    async def search_news(self, claim: str, num_results: Optional[int] = None) -> List[SearchResult]:
+        """
+        Search for news articles via NewsAPI.org (news-first verification).
+
+        Prioritizes news sources (Reuters, AP, BBC, etc.) for claims
+        that relate to current events or articles. This is called BEFORE
+        the general Serper web search — if results are found here, the
+        pipeline can skip the broader web search.
+
+        Args:
+            claim: The user-submitted claim or article text to search for.
+            num_results: Override the default number of results.
+
+        Returns:
+            A list of SearchResult objects from NewsAPI.
+            Returns an empty list if the API key is missing or the request fails.
+        """
+        if not self.is_news_available:
+            print("[SCOUT] Skipped NewsAPI -- no NEWS_API key configured")
+            return []
+
+        query_text = claim.strip()[:300]
+        results_count = num_results or self.num_results
+
+        try:
+            async with httpx.AsyncClient(timeout=12.0) as client:
+                response = await client.get(
+                    self.NEWSAPI_ENDPOINT,
+                    params={
+                        "q": query_text,
+                        "pageSize": results_count,
+                        "sortBy": "relevancy",
+                        "language": "en",
+                    },
+                    headers={
+                        "X-Api-Key": self.news_api_key,
+                    },
+                )
+                response.raise_for_status()
+                data = response.json()
+
+            # Parse NewsAPI articles
+            articles = data.get("articles", [])
+            results: List[SearchResult] = []
+
+            for idx, article in enumerate(articles[:results_count]):
+                results.append(
+                    SearchResult(
+                        title=article.get("title", "Untitled"),
+                        url=article.get("url", ""),
+                        snippet=article.get("description", "") or article.get("content", "")[:200],
+                        position=idx + 1,
+                    )
+                )
+
+            print(f"[SCOUT] NewsAPI: Found {len(results)} news articles for: {query_text[:80]}...")
+            return results
+
+        except httpx.TimeoutException:
+            print("[SCOUT] WARNING: NewsAPI request timed out")
+            return []
+        except httpx.HTTPStatusError as e:
+            print(f"[SCOUT] WARNING: NewsAPI HTTP {e.response.status_code}: {e.response.text[:200]}")
+            return []
+        except Exception as e:
+            print(f"[SCOUT] WARNING: NewsAPI error: {type(e).__name__}: {e}")
+            traceback.print_exc()
+            return []
 
     async def search(self, claim: str, num_results: Optional[int] = None) -> List[SearchResult]:
         """

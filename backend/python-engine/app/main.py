@@ -17,13 +17,13 @@ from app.routes import image_sse
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle manager — load ML models on startup."""
-    print("[STARTUP] Fraud Detection Engine starting up...")
+    print("[STARTUP] Fraud Detection Engine starting up...", flush=True)
     # Load ML model or external API client on startup
     from app.services.detector import FraudDetector
     app.state.detector = FraudDetector()
-    print("[READY] Fraud detection model loaded successfully")
+    print("[READY] Fraud detection model loaded successfully", flush=True)
     yield
-    print("[SHUTDOWN] Fraud Detection Engine shutting down...")
+    print("[SHUTDOWN] Fraud Detection Engine shutting down...", flush=True)
 
 
 app = FastAPI(

@@ -341,11 +341,24 @@ export const guestAPI = {
 
 // ─── Image Analysis Types ──────────────────────────
 
-export type ImageVerdict = "AI_GENERATED" | "VERIFIED_REAL" | "MISLEADING" | "UNVERIFIABLE";
+export type ImageVerdict = "VERIFIED_REAL" | "MISLEADING" | "UNVERIFIABLE";
 export type ImageConfidence = "Low" | "Medium" | "High" | "Critical";
+
+export interface ImageSourceReference {
+  title: string;
+  url: string;
+  snippet: string;
+}
+
+export interface ImageAuditTrail {
+  serperQuery: string;
+  jinaUrlsProcessed: string[];
+  openrouterModel: string;
+}
 
 export interface ImageAnalysisResult {
   verdict: ImageVerdict;
+  verificationStatus: string;
   isFraud: boolean;
   riskScore: number;
   confidenceLevel: ImageConfidence;
@@ -353,8 +366,9 @@ export interface ImageAnalysisResult {
   analysisSummary: string;
   extractionMethod: string | null;
   extractedContent: string | null;
-  userDate: string | null;
-  aiDetectionScore: number | null;
+  evidenceTimeline: string[];
+  sources: ImageSourceReference[];
+  auditTrail: ImageAuditTrail | null;
 }
 
 export type ImageStageEvent = {
@@ -364,11 +378,6 @@ export type ImageStageEvent = {
   text: string;
 };
 
-export type ImageAIDetectionEvent = {
-  type: "ai_detection";
-  is_ai_generated: boolean;
-  ai_score: number;
-};
 
 export type ImageExtractionEvent = {
   type: "extraction";
@@ -389,7 +398,6 @@ export type ImageErrorEvent = {
 
 export type ImageStreamEvent =
   | ImageStageEvent
-  | ImageAIDetectionEvent
   | ImageExtractionEvent
   | ImageCompletedEvent
   | ImageErrorEvent;
@@ -405,13 +413,11 @@ export const imageAPI = {
    */
   checkStream: async (
     file: File,
-    date: string,
     onEvent: (event: ImageStreamEvent) => void,
     signal?: AbortSignal,
   ): Promise<void> => {
     const formData = new FormData();
     formData.append("image", file);
-    formData.append("date", date);
 
     const response = await fetch(`${PYTHON_ENGINE_URL}/image/stream`, {
       method: "POST",
@@ -448,8 +454,6 @@ export const imageAPI = {
               const parsed = JSON.parse(eventData);
               if (eventType === "stage") {
                 onEvent({ type: "stage", stage: parsed.stage, sequence: parsed.sequence, text: parsed.text });
-              } else if (eventType === "ai_detection") {
-                onEvent({ type: "ai_detection", is_ai_generated: parsed.is_ai_generated, ai_score: parsed.ai_score });
               } else if (eventType === "extraction") {
                 onEvent({ type: "extraction", method: parsed.method, success: parsed.success, preview: parsed.preview });
               } else if (eventType === "completed") {

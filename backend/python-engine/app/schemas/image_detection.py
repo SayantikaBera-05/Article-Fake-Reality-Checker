@@ -7,11 +7,12 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from enum import Enum
 
+from app.schemas.detection import SourceReference, AuditTrail
+
 
 class ImageVerdict(str, Enum):
     """High-level verdict category for image analysis."""
 
-    AI_GENERATED = "AI_GENERATED"
     VERIFIED_REAL = "VERIFIED_REAL"
     MISLEADING = "MISLEADING"
     UNVERIFIABLE = "UNVERIFIABLE"
@@ -66,6 +67,10 @@ class ImageAnalysisResult(BaseModel):
     verdict: ImageVerdict = Field(
         ..., description="High-level verdict category"
     )
+    verificationStatus: str = Field(
+        default="CONTRADICTED",
+        description="Verification status: VERIFIED or CONTRADICTED"
+    )
     isFraud: bool = Field(
         ..., description="Whether the image/content is misleading or fabricated"
     )
@@ -89,18 +94,26 @@ class ImageAnalysisResult(BaseModel):
     extractedContent: Optional[str] = Field(
         None, description="The content extracted from the image (if any)"
     )
-    userDate: Optional[str] = Field(
-        None, description="The user-provided date associated with the image"
+    evidenceTimeline: List[str] = Field(
+        default_factory=list,
+        description="Bulleted evidence list with source citations"
     )
-    aiDetectionScore: Optional[float] = Field(
-        None, description="Sightengine AI generation score"
+    sources: List[SourceReference] = Field(
+        default_factory=list,
+        description="Web sources consulted during the RAG analysis pipeline"
     )
+    auditTrail: Optional[AuditTrail] = Field(
+        default=None,
+        description="Tool execution log: Serper query, Jina URLs, OpenRouter model"
+    )
+
 
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
                     "verdict": "MISLEADING",
+                    "verificationStatus": "CONTRADICTED",
                     "isFraud": True,
                     "riskScore": 78,
                     "confidenceLevel": "High",
@@ -108,9 +121,18 @@ class ImageAnalysisResult(BaseModel):
                     "analysisSummary": "The image contains text claiming...",
                     "extractionMethod": "ocr",
                     "extractedContent": "Breaking: ...",
-                    "userDate": "2025-01-15",
-                    "aiDetectionScore": 0.05,
+                    "evidenceTimeline": [
+                        "[Reuters](https://reuters.com/...) - Confirms this claim is false"
+                    ],
+                    "sources": [
+                        {
+                            "title": "Reuters Fact Check",
+                            "url": "https://reuters.com/fact-check/...",
+                            "snippet": "This claim has been debunked...",
+                        }
+                    ],
                 }
             ]
         }
     }
+

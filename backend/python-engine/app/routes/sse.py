@@ -100,7 +100,7 @@ async def pipeline_stream(
         return
 
     try:
-        # --- Stage 1: SCOUT -- Search for evidence -------
+        # --- Stage 1: SCOUT -- Search for evidence (News-first) ---
         yield sse_stage("SCOUT", 1, "Searching for evidence...")
         serper_query = f"fact check {claim.strip()[:300]}"
         print(f"\n{'=' * 60}")
@@ -108,8 +108,24 @@ async def pipeline_stream(
         print(f"{'=' * 60}")
 
         search_results = []
-        if rag_enabled and detector_scout.is_available:
+
+        # Step 1a: Try NewsAPI first (news-first verification)
+        if rag_enabled and detector_scout.is_news_available:
             try:
+                print(f"[SSE PIPELINE] Stage 1a -- NEWS SEARCH (NewsAPI.org)...")
+                search_results = await detector_scout.search_news(claim)
+                if search_results:
+                    print(f"[SSE PIPELINE] ✓ Found {len(search_results)} news articles")
+                else:
+                    print(f"[SSE PIPELINE] ✗ No news articles — falling back to web search")
+            except Exception as e:
+                print(f"[SSE PIPELINE] WARNING: NewsAPI failed: {type(e).__name__}: {e}")
+                traceback.print_exc()
+
+        # Step 1b: Fall back to Serper web search
+        if not search_results and rag_enabled and detector_scout.is_available:
+            try:
+                print(f"[SSE PIPELINE] Stage 1b -- WEB SEARCH (Serper.dev)...")
                 search_results = await detector_scout.search(claim)
             except Exception as e:
                 print(f"[SSE PIPELINE] WARNING: Scout failed: {type(e).__name__}: {e}")

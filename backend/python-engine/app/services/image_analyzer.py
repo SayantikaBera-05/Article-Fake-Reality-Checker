@@ -325,16 +325,14 @@ class ImageContentExtractor:
 # Specialized image verification prompt for AUDITOR-7
 IMAGE_REALITY_SYSTEM_PROMPT = """You are AUDITOR-7, a senior forensic image verification investigator.
 
-You are given EXTRACTED CONTENT from an image (either text found via OCR, or a scene description from a vision model) along with a DATE the user claims the image is from.
+You are given EXTRACTED CONTENT from an image (either text found via OCR, or a scene description from a vision model).
 
-Your job: Determine if the image's content is MISLEADING, FABRICATED, or LEGITIMATE when cross-referenced against the claimed date and known facts.
+Your job: Determine if the image's content is MISLEADING, FABRICATED, or LEGITIMATE by analyzing the extracted content against known facts.
 
 You must respond ONLY with a valid JSON object. No markdown fences, no explanations outside the JSON."""
 
 IMAGE_REALITY_PROMPT = """IMAGE REALITY VERIFICATION CASE FILE
 ══════════════════════════════════════
-
-▸ CLAIMED DATE: {user_date}
 
 ▸ EXTRACTION METHOD: {extraction_method}
 
@@ -345,12 +343,13 @@ IMAGE_REALITY_PROMPT = """IMAGE REALITY VERIFICATION CASE FILE
 
 INSTRUCTIONS:
 Analyze whether the extracted content from this image is factually accurate,
-misleading, or fabricated — especially in the context of the claimed date.
+misleading, or fabricated based on your analysis of the content.
 
 Consider:
-- Does the content match events known to have occurred on/around the claimed date?
-- Are there anachronisms, logical impossibilities, or fabricated details?
+- Is the text or visual content factually accurate and verifiable?
+- Are there logical impossibilities, fabricated details, or misleading claims?
 - Could the image be a screenshot of fake news, a manipulated headline, or satire?
+- Does the content contain known misinformation or debunked claims?
 
 Return your verdict as a **valid JSON object** with exactly these keys:
 
@@ -358,14 +357,14 @@ Return your verdict as a **valid JSON object** with exactly these keys:
   "isFraud": <boolean — true if misleading/fabricated/misinformation; false if legitimate or unverifiable>,
   "riskScore": <integer 0–100 — 0=trustworthy, 100=completely fabricated>,
   "confidenceLevel": "<one of: Low, Medium, High, Critical>",
-  "flags": ["<list of specific red flags, date mismatches, or fabrication indicators found>"],
-  "analysisSummary": "<A detailed 3–5 sentence forensic analysis. Reference the claimed date, the extracted content, and your assessment of authenticity.>"
+  "flags": ["<list of specific red flags or fabrication indicators found>"],
+  "analysisSummary": "<A detailed 3–5 sentence forensic analysis. Reference the extracted content and your assessment of authenticity.>"
 }}
 
 SCORING GUIDELINES:
-- 0–25: Content is factual and consistent with the claimed date
+- 0–25: Content is factual and verifiable
 - 26–50: Minor inaccuracies or claims that cannot be fully verified
-- 51–75: Significant misleading content or date mismatches
+- 51–75: Significant misleading content or fabrication indicators
 - 76–100: Fabricated, deliberately deceptive, or contradicts known facts
 
 Return ONLY the JSON object."""
@@ -373,19 +372,17 @@ Return ONLY the JSON object."""
 
 async def run_custom_reality_check(
     extracted_content: str,
-    user_date: str,
     extraction_method: str = "unknown",
 ) -> ImageAnalysisResult:
     """
     Run the custom reality check on extracted image content using AUDITOR-7.
 
     This function takes the content extracted from an image (either OCR text
-    or a Vision model description) along with the user-provided date, and
-    sends them to the OpenRouter LLM for forensic analysis.
+    or a Vision model description) and sends it to the OpenRouter LLM for
+    forensic analysis.
 
     Args:
         extracted_content: Text extracted from the image.
-        user_date: The date the user claims the image is from.
         extraction_method: How the content was extracted ('ocr' or 'vision').
 
     Returns:
@@ -404,12 +401,10 @@ async def run_custom_reality_check(
             analysisSummary="Cannot perform reality check — no API key configured.",
             extractionMethod=extraction_method,
             extractedContent=extracted_content[:500],
-            userDate=user_date,
         )
 
     # Build prompt
     prompt = IMAGE_REALITY_PROMPT.format(
-        user_date=user_date,
         extraction_method=extraction_method.upper(),
         extracted_content=extracted_content[:3000],  # Truncate to avoid token overflow
     )
@@ -487,7 +482,6 @@ async def run_custom_reality_check(
             ),
             extractionMethod=extraction_method,
             extractedContent=extracted_content[:500],
-            userDate=user_date,
         )
 
     except Exception as e:
@@ -503,7 +497,6 @@ async def run_custom_reality_check(
             analysisSummary=f"The reality check pipeline encountered an error: {str(e)}. Please try again.",
             extractionMethod=extraction_method,
             extractedContent=extracted_content[:500],
-            userDate=user_date,
         )
 
 

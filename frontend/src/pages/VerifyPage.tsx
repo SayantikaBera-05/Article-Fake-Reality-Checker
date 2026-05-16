@@ -13,7 +13,6 @@ import {
   X,
   CheckCircle2,
   AlertTriangle,
-  Calendar,
   Trash2,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -34,13 +33,13 @@ export function VerifyPage() {
 
   // ─── Image State ────────────────────────────────
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageDate, setImageDate] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isImageAnalyzing, setIsImageAnalyzing] = useState(false);
   const [imageResult, setImageResult] = useState<ImageAnalysisResult | null>(null);
   const [imageStages, setImageStages] = useState<{ stage: string; text: string; status: 'waiting' | 'running' | 'done' }[]>([
-    { stage: 'DETECTING_AI', text: 'AI Detection', status: 'waiting' },
     { stage: 'EXTRACTING_CONTENT', text: 'Content Extraction', status: 'waiting' },
+    { stage: 'SEARCHING_EVIDENCE', text: 'Searching Evidence', status: 'waiting' },
+    { stage: 'SCRAPING_SOURCES', text: 'Scraping Sources', status: 'waiting' },
     { stage: 'VERIFYING_REALITY', text: 'Reality Verification', status: 'waiting' },
   ]);
 
@@ -131,28 +130,25 @@ export function VerifyPage() {
       setError('Please select an image to verify.');
       return;
     }
-    if (!imageDate) {
-      setError('Please enter the claimed date for this image.');
-      return;
-    }
 
     setError(null);
     setImageResult(null);
     setIsImageAnalyzing(true);
     setImageStages([
-      { stage: 'DETECTING_AI', text: 'AI Detection', status: 'waiting' },
       { stage: 'EXTRACTING_CONTENT', text: 'Content Extraction', status: 'waiting' },
+      { stage: 'SEARCHING_EVIDENCE', text: 'Searching Evidence', status: 'waiting' },
+      { stage: 'SCRAPING_SOURCES', text: 'Scraping Sources', status: 'waiting' },
       { stage: 'VERIFYING_REALITY', text: 'Reality Verification', status: 'waiting' },
     ]);
 
     try {
-      await imageAPI.checkStream(imageFile, imageDate, (event: ImageStreamEvent) => {
+      await imageAPI.checkStream(imageFile, (event: ImageStreamEvent) => {
         if (event.type === 'stage') {
           setImageStages(prev =>
             prev.map(s => {
               if (s.stage === event.stage) return { ...s, text: event.text, status: 'running' };
               // Mark earlier stages as done
-              const stageOrder = ['DETECTING_AI', 'EXTRACTING_CONTENT', 'VERIFYING_REALITY'];
+              const stageOrder = ['EXTRACTING_CONTENT', 'SEARCHING_EVIDENCE', 'SCRAPING_SOURCES', 'VERIFYING_REALITY'];
               const eventIdx = stageOrder.indexOf(event.stage);
               const sIdx = stageOrder.indexOf(s.stage);
               if (sIdx < eventIdx && s.status === 'running') return { ...s, status: 'done' };
@@ -395,7 +391,7 @@ export function VerifyPage() {
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-gray-900 mb-3">Image Verifier</h2>
             <p className="text-slate-600 dark:text-gray-600 text-sm mb-4 flex-1">
-              Detect manipulated visuals, AI generation, and synthetic fabrications.
+              Verify image authenticity through content extraction and forensic reality analysis.
             </p>
             
             {/* Upload Dropzone / Preview */}
@@ -445,26 +441,12 @@ export function VerifyPage() {
               </div>
             )}
 
-            {/* Date Input */}
-            <div className="relative mb-4">
-              <label className="block text-xs font-semibold text-slate-600 dark:text-gray-600 mb-1.5 tracking-wide uppercase">Claimed Date</label>
-              <div className="relative">
-                <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                <input
-                  type="date"
-                  value={imageDate}
-                  onChange={(e) => setImageDate(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-gray-300/50 bg-white dark:bg-white/40 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-                  placeholder="When was this image reportedly taken?"
-                />
-              </div>
-            </div>
 
             {/* Submit Button */}
             <button
               type="button"
               onClick={handleImageSubmit}
-              disabled={isImageAnalyzing || !imageFile || !imageDate}
+              disabled={isImageAnalyzing || !imageFile}
               className="w-full bg-gray-100 dark:bg-gray-100 text-gray-900 hover:bg-primary hover:text-black rounded-xl py-3 font-semibold transition-all duration-300 shadow-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] mt-auto disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isImageAnalyzing ? (
@@ -605,48 +587,19 @@ export function VerifyPage() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   
                   {/* Verdict Badge */}
                   <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col items-center justify-center text-center">
                     <h4 className="text-gray-500 font-medium mb-4 uppercase tracking-wide text-xs">Verdict</h4>
                     <div className={`px-5 py-2.5 rounded-full font-bold text-lg ${
                       imageResult.verdict === 'VERIFIED_REAL' ? 'bg-green-100 text-green-700 border border-green-300' :
-                      imageResult.verdict === 'AI_GENERATED' ? 'bg-red-100 text-red-700 border border-red-300' :
                       imageResult.verdict === 'MISLEADING' ? 'bg-orange-100 text-orange-700 border border-orange-300' :
                       'bg-gray-100 text-gray-700 border border-gray-300'
                     }`}>
                       {imageResult.verdict?.replace(/_/g, ' ')}
                     </div>
                     <p className="text-xs text-gray-500 mt-3">Confidence: {imageResult.confidenceLevel}</p>
-                  </div>
-
-                  {/* AI Detection Score */}
-                  <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col items-center justify-center text-center">
-                    <h4 className="text-gray-500 font-medium mb-4 uppercase tracking-wide text-xs">AI Detection</h4>
-                    <div className="relative w-28 h-28 mb-3">
-                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="40" fill="transparent" stroke="#e5e7eb" strokeWidth="8" />
-                        <motion.circle
-                          cx="50" cy="50" r="40"
-                          fill="transparent"
-                          stroke={(imageResult.aiDetectionScore || 0) * 100 >= 50 ? '#ef4444' : '#22c55e'}
-                          strokeWidth="8"
-                          strokeLinecap="round"
-                          initial={{ strokeDasharray: "251.2", strokeDashoffset: "251.2" }}
-                          animate={{ strokeDashoffset: 251.2 * (1 - (imageResult.aiDetectionScore || 0)) }}
-                          transition={{ duration: 1.5, ease: "easeOut" }}
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className={`font-mono text-2xl font-bold ${
-                          (imageResult.aiDetectionScore || 0) * 100 >= 50 ? 'text-red-500' : 'text-green-500'
-                        }`}>
-                          {Math.round((imageResult.aiDetectionScore || 0) * 100)}%
-                        </span>
-                        <span className="text-gray-500 text-xs">AI Score</span>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Risk Score */}
@@ -699,6 +652,52 @@ export function VerifyPage() {
                   <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Analysis Summary</h4>
                   <p className="text-slate-800 leading-relaxed">{imageResult.analysisSummary}</p>
                 </div>
+
+                {/* Evidence Timeline */}
+                {imageResult.evidenceTimeline && imageResult.evidenceTimeline.length > 0 && (
+                  <div className="mt-6 bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                    <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Evidence Timeline</h4>
+                    <ul className="space-y-2">
+                      {imageResult.evidenceTimeline.map((item, i) => (
+                        <motion.li
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.08 * i }}
+                          className="flex items-start gap-2 text-sm text-slate-700"
+                        >
+                          <CheckCircle2 size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                          <span dangerouslySetInnerHTML={{ __html: item.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-indigo-600 underline">$1</a>') }} />
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Sources Consulted */}
+                {imageResult.sources && imageResult.sources.length > 0 && (
+                  <div className="mt-6 bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                    <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Sources Consulted</h4>
+                    <div className="space-y-3">
+                      {imageResult.sources.map((source, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 * i }}
+                          className="bg-white rounded-xl p-4 border border-slate-200"
+                        >
+                          <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 font-medium text-sm hover:underline">
+                            {source.title}
+                          </a>
+                          {source.snippet && (
+                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{source.snippet}</p>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
