@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # OpenRouter model configuration
     OPENROUTER_API_KEY: Optional[str] = None
     ALLOWED_ORIGINS: str = "http://localhost:5000"
-    OPENROUTER_MODEL_NAME: str = "openrouter/free"
+    OPENROUTER_MODEL_NAME: str = "openrouter/auto"
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
     OPENROUTER_TEMPERATURE: float = 0.3
     OPENROUTER_SITE_URL: Optional[str] = None   # For OpenRouter rankings
