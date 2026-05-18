@@ -15,7 +15,7 @@ export function ArchitectureSection() {
     {
       icon: <Brain size={32} className="text-primary mb-4" />,
       title: "Claim Extraction",
-      desc: "Our Analyst Agent powered by Groq Llama 3 instantly analyzes the input, utilizing evidence retrieved by the Scout to extract the core factual claim being made.",
+      desc: "Our Analyst Agent powered by Openrouter instantly analyzes the input, utilizing evidence retrieved by the Scout to extract the core factual claim being made.",
     },
     {
       icon: <Search size={32} className="text-primary mb-4" />,

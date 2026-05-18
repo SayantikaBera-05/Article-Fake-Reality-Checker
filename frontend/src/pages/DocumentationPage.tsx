@@ -68,9 +68,9 @@ export function DocumentationPage() {
 
   const apisUsed = [
     {
-      name: 'Groq API',
-      url: 'https://groq.com/',
-      description: 'Powers our lightning-fast Llama 3 models. Groq\'s LPU (Language Processing Unit) architecture allows us to run complex reasoning tasks across our Agentic Pipeline in milliseconds rather than seconds.',
+      name: 'OpenRouter',
+      url: 'https://openrouter.ai/',
+      description: 'Powers our lightning-fast Llama 3 models. OpenRouter allows us to run complex reasoning tasks across our Agentic Pipeline in milliseconds rather than seconds.',
       icon: <Zap className="text-yellow-500" size={24} />
     },
     {
@@ -283,7 +283,7 @@ export function DocumentationPage() {
                       <span className="text-slate-900 font-bold text-sm">Analyst Agent</span>
                       <span className="text-slate-500 text-xs mt-2 text-center border-t border-slate-100 pt-2 w-full">Veracity Scoring</span>
                       
-                      {/* Sub-node: Groq */}
+                      {/* Sub-node: OpenRouter */}
                       <div className="mt-6 flex flex-col items-center w-full">
                         <div className="w-0.5 h-6 bg-slate-200 mb-2 relative overflow-hidden">
                           <VerticalDataPacket delay={0.1} duration={0.8} />
@@ -291,7 +291,7 @@ export function DocumentationPage() {
                         </div>
                         <div className="bg-amber-50 text-amber-700 text-[10px] uppercase font-bold py-1.5 px-3 rounded-md w-full flex items-center justify-center gap-2 border border-amber-200">
                           <Zap size={12} className="text-yellow-500" />
-                          Groq Llama 3
+                          OpenRouter Llama 3
                         </div>
                       </div>
                     </motion.div>
@@ -365,7 +365,7 @@ export function DocumentationPage() {
                 <div className="bg-amber-100 text-amber-700 p-3 rounded-full shrink-0 mt-1"><BrainCircuit size={20} /></div>
                 <div>
                   <h4 className="text-lg font-bold text-slate-900 m-0 mb-1">3. The Analyst Agent</h4>
-                  <p className="text-slate-600 m-0">This is the core reasoning engine. Powered by <strong>Groq's LPU inferencing (running Llama 3)</strong>, the Analyst cross-references the user's original claim against the thousands of words of Markdown evidence compiled by the Reader. It streams its logical deduction back to the user in real-time before issuing a final JSON payload containing the Veracity Score and Confidence Level.</p>
+                  <p className="text-slate-600 m-0">This is the core reasoning engine. Powered by <strong>OpenRouter (running Llama 3)</strong>, the Analyst cross-references the user's original claim against the thousands of words of Markdown evidence compiled by the Reader. It streams its logical deduction back to the user in real-time before issuing a final JSON payload containing the Veracity Score and Confidence Level.</p>
                 </div>
               </div>
             </div>

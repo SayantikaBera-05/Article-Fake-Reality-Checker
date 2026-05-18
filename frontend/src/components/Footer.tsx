@@ -65,7 +65,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-200 dark:border-gray-200/50 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 dark:text-gray-600 text-sm">
         <p>© 2026 Verifi. All rights reserved.</p>
-        <p>Powered by Groq & Llama 3</p>
+        <p>Powered by OpenRouter & Llama 3</p>
       </div>
     </footer>
   );

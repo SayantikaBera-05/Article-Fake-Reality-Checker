@@ -115,7 +115,7 @@ export function HeroSection() {
           className="text-sm sm:text-lg md:text-xl text-slate-200 max-w-xl mb-6 sm:mb-8 animate-blur-fade-up drop-shadow-md"
           style={{ animationDelay: '1.0s' }}
         >
-          Real-time fact-checking powered by Groq LPU & Agentic AI. Paste a claim, URL, or image to uncover the truth.
+          Real-time fact-checking powered by Openrouter & Agentic AI. Paste a claim, URL, or image to uncover the truth.
         </p>
       </div>
     </section>
