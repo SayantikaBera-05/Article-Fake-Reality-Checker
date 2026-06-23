@@ -14,7 +14,7 @@ The powerful, dual-service backend infrastructure powering the **Verifi** AI fac
 
 Verifi's backend is split into two specialized microservices:
 1. **API Gateway (Node.js)**: Handles user authentication (JWT & Google OAuth2), rate limiting, data persistence in MongoDB, and secure routing.
-2. **AI Engine (Python)**: A dedicated FastAPI service that performs heavy lifting, including web scraping (BeautifulSoup4/Newspaper3k) and intelligent claim analysis via Google Gemini 1.5.
+2. **AI Engine (Python)**: A dedicated FastAPI service that performs heavy lifting, including web search via Serper.dev, content extraction via Jina AI, AI-generated image detection via Sightengine, and intelligent claim analysis via OpenRouter (Llama models).
 
 ---
 
@@ -31,8 +31,8 @@ Verifi's backend is split into two specialized microservices:
 - **Language:** Python 3.10+
 - **Framework:** FastAPI
 - **Server:** Uvicorn
-- **AI/ML:** Google Generative AI SDK (Gemini 1.5 Pro)
-- **Scraping:** BeautifulSoup4, Newspaper3k, HTTPX
+- **AI/ML:** OpenRouter API (Llama models), Sightengine API (Image Detection)
+- **Scraping & Search:** Serper.dev API, Jina AI Reader API
 
 ---
 
@@ -42,7 +42,8 @@ Verifi's backend is split into two specialized microservices:
 - **Node.js** v18 or higher
 - **Python** v3.10 or higher
 - **MongoDB** instance (Local or Atlas)
-- **Google Cloud Console** credentials (for OAuth2 and Gemini)
+- **Google Cloud Console** credentials (for OAuth2)
+- **API Keys**: OpenRouter, Serper.dev, Sightengine
 
 ### 1. Node.js Gateway Setup
 ```bash
@@ -59,7 +60,7 @@ npm run dev
 ### 2. Python AI Engine Setup
 ```bash
 # Navigate to engine directory
-cd ai-engine
+cd python-engine
 
 # Create and activate virtual environment
 python -m venv venv
@@ -91,10 +92,13 @@ SMTP_USER=your_email@gmail.com
 GOOGLE_REFRESH_TOKEN=your_oauth2_refresh_token
 ```
 
-### AI Engine (`/ai-engine/.env`)
+### AI Engine (`/python-engine/.env`)
 ```env
 PORT=8000
-MODEL_API_KEY=your_google_gemini_api_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+SERPER_API_KEY=your_serper_api_key
+SIGHTENGINE_API_USER=your_sightengine_api_user
+SIGHTENGINE_API_SECRET=your_sightengine_api_secret
 ALLOWED_ORIGINS=http://localhost:5000
 ```
 
@@ -114,11 +118,11 @@ backend/
 │   │   └── server.js       # Entry point
 │   └── .env
 │
-└── ai-engine/              # Python FastAPI Engine
+└── python-engine/          # Python FastAPI Engine
     ├── app/
-    │   ├── routes/         # API endpoints
-    │   ├── services/       # ML logic & Gemini integration
-    │   ├── schemas/        # Pydantic data models
+    │   ├── api/            # API endpoints
+    │   ├── services/       # Agentic ML logic (Scout, Reader, Analyst, Image Analyzer)
+    │   ├── models/         # Pydantic data models
     │   └── main.py         # App initialization
     ├── requirements.txt
     └── .env
@@ -137,7 +141,7 @@ backend/
 - `POST /api/verify/check` - The main entry point for analysis. Validates the request and forwards data to the AI Engine.
 
 ### AI Processing (Internal)
-- `POST /process-claim` - (Internal) Receives claim data, performs research, and returns an AI-generated verdict.
+- `POST /api/verify` - (Internal) Receives claim data, performs research, and streams an AI-generated verdict back to the client.
 
 ---
 

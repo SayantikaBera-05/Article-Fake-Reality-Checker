@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![Groq](https://img.shields.io/badge/Groq-f55036?style=for-the-badge&logo=groq&logoColor=white)
+![OpenRouter](https://img.shields.io/badge/OpenRouter-1F1F1F?style=for-the-badge&logo=openrouter&logoColor=white)
 
 The **Python Agentic Engine** is a high-performance, asynchronous microservice built with **FastAPI**. It contains the core intelligence of the Verifi platform, executing the complex Retrieval-Augmented Generation (RAG) and Agentic pipelines required for real-time fact-checking.
 
@@ -24,8 +24,13 @@ The engine utilizes three specialized "agents" working in parallel and sequence 
 
 ### 3. The Analyst (`analyst.py`)
 - **Role**: The Judge.
-- **Technology**: Powered by **Groq LPU (Llama 3.1 8B Instant)** for ultra-low latency inference.
+- **Technology**: Powered by **OpenRouter API (Llama models)** for intelligent inference.
 - **Action**: Receives the claim and the scraped evidence. Evaluates the context, maps contradictions, and generates a structured JSON output containing the Veracity Label (True, False, Misleading, Unverifiable), Confidence Score, and a detailed reasoning summary.
+
+### 4. The Image Analyzer (`image_analyzer.py`)
+- **Role**: Visual Forensics.
+- **Technology**: Powered by **Sightengine API** and **LLaMA Vision Model**.
+- **Action**: Evaluates images for AI generation signatures and extracts context using vision models, providing a detailed analysis of the image's authenticity.
 
 ---
 
@@ -62,7 +67,7 @@ Because agentic workflows take time (searching -> scraping -> inferencing), the 
    ```bash
    pip install -r requirements.txt
    ```
-4. Set up your `.env` file with `GROQ_API_KEY` and `SERPER_API_KEY`.
+4. Set up your `.env` file with `OPENROUTER_API_KEY`, `SERPER_API_KEY`, and Sightengine keys (if checking images).
 5. Start the FastAPI server:
    ```bash
    python run.py

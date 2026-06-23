@@ -23,7 +23,7 @@ class FraudDetectionRequest(BaseModel):
     The gateway sends article/claim text in the `description` field.
     Other fields (transactionAmount, transactionType, etc.) are kept
     for backward-compatibility with the existing frontend contract
-    but are NOT used by the Gemini analysis engine.
+    but are NOT used by the analysis engine.
     """
 
     transactionAmount: float = Field(
@@ -71,10 +71,30 @@ class SourceReference(BaseModel):
     snippet: str = Field("", description="Brief snippet from the search result")
 
 
+# ─── Audit Trail ───────────────────────────────────
+class AuditTrail(BaseModel):
+    """Tool execution log for the verification pipeline."""
+
+    serperQuery: str = Field(
+        "", description="The exact Serper search query used"
+    )
+    jinaUrlsProcessed: List[str] = Field(
+        default_factory=list,
+        description="List of URLs processed by Jina AI Reader"
+    )
+    openrouterModel: str = Field(
+        "", description="The OpenRouter model used for evaluation"
+    )
+
+
 # ─── Response Schema ───────────────────────────────
 class FraudDetectionResponse(BaseModel):
     """Strict response schema returned to the Node gateway."""
 
+    verificationStatus: str = Field(
+        default="CONTRADICTED",
+        description="Verification status: VERIFIED or CONTRADICTED"
+    )
     isFraud: bool = Field(
         ...,
         description="Whether the content is flagged as misleading/false"
@@ -91,7 +111,15 @@ class FraudDetectionResponse(BaseModel):
         description="List of specific misinformation indicators found"
     )
     analysisSummary: str = Field(
-        ..., description="Human-readable summary of the analysis"
+        ..., description="Human-readable executive summary of the analysis"
+    )
+    evidenceTimeline: List[str] = Field(
+        default_factory=list,
+        description="Bulleted evidence list with source citations"
+    )
+    auditTrail: Optional[AuditTrail] = Field(
+        default=None,
+        description="Tool execution log: Serper query, Jina URLs, OpenRouter model"
     )
     sources: List[SourceReference] = Field(
         default_factory=list,
@@ -102,14 +130,24 @@ class FraudDetectionResponse(BaseModel):
         "json_schema_extra": {
             "examples": [
                 {
+                    "verificationStatus": "CONTRADICTED",
                     "isFraud": True,
                     "riskScore": 92,
                     "confidenceLevel": "High",
                     "flags": [
-                        "No credible source cited",
-                        "Contradicts established scientific consensus",
+                        "Direct contradiction: NASA article explicitly states Earth is not flat (https://www.nasa.gov/...)",
+                        "Cherry-picked technical language misrepresented as admission",
                     ],
-                    "analysisSummary": "The claim that NASA confirmed the Earth is flat is fabricated...",
+                    "analysisSummary": "The claim that NASA confirmed the Earth is flat is CONTRADICTED by external evidence...",
+                    "evidenceTimeline": [
+                        "[NASA.gov](https://www.nasa.gov/...) - Explicitly debunks flat Earth claims",
+                        "[AAP FactCheck](https://aapnews.aap.com.au/...) - Confirms misquoting of technical docs",
+                    ],
+                    "auditTrail": {
+                        "serperQuery": "fact check NASA confirmed Earth is flat 2025",
+                        "jinaUrlsProcessed": ["https://www.nasa.gov/...", "https://aapnews.aap.com.au/..."],
+                        "openrouterModel": "openrouter/auto",
+                    },
                     "sources": [
                         {
                             "title": "Reuters Fact Check",

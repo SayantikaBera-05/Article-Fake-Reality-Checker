@@ -52,13 +52,13 @@ class Scout:
         self.num_results: int = settings.SERPER_NUM_RESULTS
 
         if self.api_key:
-            print(f"[SCOUT] Serper.dev agent initialized (top {self.num_results} results)")
+            print(f"[SCOUT] Serper.dev agent initialized (top {self.num_results} results)", flush=True)
         else:
-            print("[SCOUT] WARNING: No SERPER_API_KEY -- search stage will be skipped")
+            print("[SCOUT] WARNING: No SERPER_API_KEY -- web search will be skipped", flush=True)
 
     @property
     def is_available(self) -> bool:
-        """Check if the Scout has a valid API key configured."""
+        """Check if the Scout has a valid Serper API key configured."""
         return bool(self.api_key)
 
     async def search(self, claim: str, num_results: Optional[int] = None) -> List[SearchResult]:
@@ -77,7 +77,7 @@ class Scout:
             Returns an empty list if the API key is missing or the request fails.
         """
         if not self.is_available:
-            print("[SCOUT] Skipped -- no API key configured")
+            print("[SCOUT] Skipped -- no API key configured", flush=True)
             return []
 
         # Truncate very long claims to a searchable query
@@ -116,16 +116,16 @@ class Scout:
                     )
                 )
 
-            print(f"[SCOUT] Found {len(results)} results for: {search_query[:80]}...")
+            print(f"[SCOUT] Found {len(results)} results for: {search_query[:80]}...", flush=True)
             return results
 
         except httpx.TimeoutException:
-            print("[SCOUT] WARNING: Request timed out -- Serper.dev unreachable")
+            print("[SCOUT] WARNING: Request timed out -- Serper.dev unreachable", flush=True)
             return []
         except httpx.HTTPStatusError as e:
-            print(f"[SCOUT] WARNING: HTTP {e.response.status_code}: {e.response.text[:200]}")
+            print(f"[SCOUT] WARNING: HTTP {e.response.status_code}: {e.response.text[:200]}", flush=True)
             return []
         except Exception as e:
-            print(f"[SCOUT] WARNING: Unexpected error: {type(e).__name__}: {e}")
+            print(f"[SCOUT] WARNING: Unexpected error: {type(e).__name__}: {e}", flush=True)
             traceback.print_exc()
             return []

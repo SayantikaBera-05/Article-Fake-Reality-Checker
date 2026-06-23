@@ -54,7 +54,7 @@ class Reader:
         """Initialize the Reader with Jina configuration."""
         self.base_url: str = settings.JINA_READER_BASE_URL
         self.timeout: int = settings.JINA_TIMEOUT
-        print(f"[READER] Jina AI Reader initialized (timeout: {self.timeout}s)")
+        print(f"[READER] Jina AI Reader initialized (timeout: {self.timeout}s)", flush=True)
 
     async def scrape(self, url: str) -> ScrapedContent:
         """
@@ -99,7 +99,7 @@ class Reader:
             # Truncate to avoid blowing up the LLM context window
             truncated = self._truncate(raw_content)
 
-            print(f"[READER] Scraped {len(raw_content)} chars from {url[:60]}... (kept {len(truncated)})")
+            print(f"[READER] Scraped {len(raw_content)} chars from {url[:60]}... (kept {len(truncated)})", flush=True)
 
             return ScrapedContent(
                 url=url,
@@ -110,17 +110,17 @@ class Reader:
 
         except httpx.TimeoutException:
             msg = f"Timed out after {self.timeout}s"
-            print(f"[READER] WARNING: {msg}: {url[:80]}")
+            print(f"[READER] WARNING: {msg}: {url[:80]}", flush=True)
             return ScrapedContent(url=url, title="", markdown_content="", success=False, error=msg)
 
         except httpx.HTTPStatusError as e:
             msg = f"HTTP {e.response.status_code}"
-            print(f"[READER] WARNING: {msg}: {url[:80]}")
+            print(f"[READER] WARNING: {msg}: {url[:80]}", flush=True)
             return ScrapedContent(url=url, title="", markdown_content="", success=False, error=msg)
 
         except Exception as e:
             msg = f"{type(e).__name__}: {e}"
-            print(f"[READER] WARNING: Unexpected error: {msg}")
+            print(f"[READER] WARNING: Unexpected error: {msg}", flush=True)
             traceback.print_exc()
             return ScrapedContent(url=url, title="", markdown_content="", success=False, error=msg)
 
@@ -145,7 +145,7 @@ class Reader:
             if content.success and content.markdown_content.strip():
                 results.append(content)
 
-        print(f"[READER] Scraped {len(results)}/{len(urls)} URLs successfully")
+        print(f"[READER] Scraped {len(results)}/{len(urls)} URLs successfully", flush=True)
         return results
 
     # ─── Helpers ─────────────────────────────────────

@@ -86,6 +86,14 @@ export function DashboardPage() {
         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
+      {/* Sidebar Backdrop */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside className={`fixed md:sticky top-0 left-0 h-screen w-64 bg-white/80 dark:bg-surface/50 backdrop-blur-md border-r border-slate-200 dark:border-gray-200/50 flex flex-col transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="p-8">
@@ -117,14 +125,14 @@ export function DashboardPage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-6 lg:p-10 relative">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 relative">
         {/* Background Noise */}
         <div className="absolute inset-0 bg-grid-pattern opacity-[0.3] mix-blend-overlay pointer-events-none z-0"></div>
 
         <div className="max-w-6xl mx-auto relative z-10 pt-4">
           <header className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-gray-900 mb-2">Dashboard Overview</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-gray-900 mb-2">Dashboard Overview</h1>
               <p className="text-gray-500 dark:text-gray-600 text-sm">Welcome back{user ? `, ${user.name.split(' ')[0]}` : ''}. Here's a summary of your activity.</p>
             </div>
             <Link
@@ -152,7 +160,7 @@ export function DashboardPage() {
                   </div>
                 </div>
                 <h3 className="text-gray-600 text-xs font-semibold uppercase tracking-wider mb-1">{stat.title}</h3>
-                <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
                 <div className={`text-xs font-medium ${stat.color}`}>{stat.change}</div>
                 
                 {/* Glow effect on hover */}
@@ -174,16 +182,16 @@ export function DashboardPage() {
               </div>
               
               {/* Custom CSS Bar Chart */}
-              <div className="h-48 flex items-end justify-between gap-2 sm:gap-4 pt-4">
+              <div className="h-48 flex items-end justify-between gap-1 sm:gap-2 md:gap-4 pt-4">
                 {chartData.map((item, i) => (
                   <div key={i} className="flex flex-col items-center gap-3">
-                    <div className="w-8 relative flex-1 flex items-end rounded-t-sm overflow-hidden group">
-                      <div className="w-8 bg-slate-100 dark:bg-gray-100/50 absolute inset-0 rounded-t-sm"></div>
+                    <div className="w-6 sm:w-8 relative flex-1 flex items-end rounded-t-sm overflow-hidden group">
+                      <div className="w-6 sm:w-8 bg-slate-100 dark:bg-gray-100/50 absolute inset-0 rounded-t-sm"></div>
                       <motion.div 
                         initial={{ height: 0 }}
                         animate={{ height: `${item.val}%` }}
                         transition={{ duration: 1, delay: 0.5 + i * 0.1, type: "spring" }}
-                        className="w-8 bg-gradient-to-t from-orange-900 to-[#00F0FF] relative z-10 rounded-t-sm shadow-[0_0_15px_rgba(0,240,255,0.2)] group-hover:from-blue-800 group-hover:to-cyan-300 transition-all"
+                        className="w-6 sm:w-8 bg-gradient-to-t from-orange-900 to-[#00F0FF] relative z-10 rounded-t-sm shadow-[0_0_15px_rgba(0,240,255,0.2)] group-hover:from-blue-800 group-hover:to-cyan-300 transition-all"
                       ></motion.div>
                     </div>
                     <span className="text-xs text-gray-500 font-medium">{item.day}</span>

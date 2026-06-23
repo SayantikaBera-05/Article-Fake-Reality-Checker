@@ -1,0 +1,52 @@
+[
+  {
+    "headline": "India Launches Chandrayaan-4 Mission to Moon's South Pole",
+    "verification": "1. **Verified?** No  \n2. **Confirming outlets?** None. Reputable space news sources (e.g., ISRO official statements, BBC, SpaceNews) have not reported a launch of Chandrayaan-4 as of May 2025. The only Indian lunar missions launched to date are Chandrayaan-1 (2008), Chandrayaan-2 (2019), and Chandrayaan-3 (2023).  \n3. **Any contradictions?** ISRO has publicly stated that Chandrayaan-4 is a planned sample-return mission, but it has not been launched and is still in development. No credible launch event has occurred.  \n4. **Confidence:** High",
+    "is_fraud": true
+  },
+  {
+    "headline": "Supreme Court Delivers Final Verdict on Ayodhya Land Dispute Appeals",
+    "verification": "1. **Verified?** Yes  \n2. **Confirming outlets:** Major news organizations such as BBC, CNN, The Hindu, Times of India, Reuters, and others reported on the Supreme Court of India delivering its final verdict on the Ayodhya land dispute on November 9, 2019.  \n3. **Any contradictions?** None. The headline accurately reflects the historical judgment.  \n4. **Confidence:** High",
+    "is_fraud": false
+  },
+  {
+    "headline": "Heatwave Claims Over 200 Lives in Northern India",
+    "verification": "1. **Verified?** Partial  \n2. **Confirming outlets?** BBC, Reuters, The Guardian, Al Jazeera, Times of India reported \"over 200 deaths\" in northern India during the June 2024 heatwave.  \n3. **Any contradictions?** Yes. Indian state government figures (e.g., Uttar Pradesh, Bihar) initially reported lower official counts (around 100–150 heatstroke deaths), leading to discrepancies between media tallies and official records.  \n4. **Confidence:** High – multiple credible international and Indian news outlets converged on the \"over 200\" figure, though official numbers varied.",
+    "is_fraud": false
+  },
+  {
+    "headline": "Indian Economy Grows at 8.1% in Q4 of Fiscal Year 2025-26",
+    "verification": "1. **Verified?** No  \n2. **Confirming outlets?** None. No credible source has reported actual GDP data for Q4 of FY 2025-26, as that period (January–March 2026) has not yet occurred.  \n3. **Any contradictions?** Yes. The most recent available data (Q4 of FY 2024-25, released in May 2025) showed growth of approximately 6.5%, not 8.1%. Projections for FY 2025-26 are preliminary and do not specify an 8.1% quarterly figure.  \n4. **Confidence:** High — the headline refers to a future quarter that cannot yet have official data.",
+    "is_fraud": true
+  },
+  {
+    "headline": "Parliament Passes Landmark Digital Personal Data Protection Bill",
+    "verification": "1. **Verified?** Yes  \n2. **Confirming outlets:** Reuters, BBC News, The Hindu, Times of India, and other major Indian and international news organizations reported on the passage of the Digital Personal Data Protection Bill in August 2023.  \n3. **Any contradictions?** None. The bill was passed by both houses of the Indian Parliament (Lok Sabha on 7 August 2023, Rajya Sabha on 9 August 2023) and later received presidential assent, becoming an act.  \n4. **Confidence:** High",
+    "is_fraud": false
+  },
+  {
+    "headline": "India Wins ICC Cricket World Cup 2026",
+    "verification": "1. **Verified?** No  \n2. **Confirming outlets?** None; no credible source has reported this.  \n3. **Any contradictions?** The next ICC Men’s Cricket World Cup (ODI) is scheduled for 2027, not 2026. The ICC Men’s T20 World Cup is in 2026, but that tournament has not yet taken place (scheduled for June 2026), so no winner exists.  \n4. **Confidence:** High",
+    "is_fraud": true
+  },
+  {
+    "headline": "Major Floods in Assam Displace Over 1 Million People",
+    "verification": "1. **Verified?** Yes  \n2. **Confirming outlets:** Reuters, BBC, NDTV, The Hindu, Al Jazeera (all reported in recent years, notably during the 2024 monsoon season, that floods in Assam displaced over 1 million people)  \n3. **Any contradictions?** No major contradictions; some regional variations in exact counts exist, but the “over 1 million” figure is consistently cited by government and media sources.  \n4. **Confidence:** High",
+    "is_fraud": false
+  },
+  {
+    "headline": "India and China Agree on Border Disengagement in Eastern Ladakh",
+    "verification": "1. **Verified?** Yes  \n2. **Confirming outlets?** Reuters, BBC, The Hindu, The Times of India, Al Jazeera, Associated Press, and other major international and Indian media outlets reported this agreement in late October 2024.  \n3. **Any contradictions?** No credible contradictions. The agreement was formally announced by both India’s Ministry of External Affairs and China’s Foreign Ministry after rounds of diplomatic and military talks.  \n4. **Confidence:** High",
+    "is_fraud": false
+  },
+  {
+    "headline": "Government Announces Universal Basic Income Pilot in Five Districts",
+    "verification": "1. **Verified?** No  \n2. **Confirming outlets?** None – no specific government, country, or date is provided, and no credible news sources are currently reporting a universal basic income pilot explicitly covering “five districts” as a generic headline.  \n3. **Any contradictions?** The claim is too vague to contradict directly, but it does not match any known, recent UBI pilot announcements (e.g., in Kenya, Finland, or the US) that specify a precise number of districts without additional context.  \n4. **Confidence:** Low – without a named government, timeframe, or sourcing, the headline cannot be confirmed as factual.",
+    "is_fraud": true
+  },
+  {
+    "headline": "ISRO Successfully Tests Reusable Launch Vehicle at Sriharikota",
+    "verification": "1. **Verified?** Partial  \n2. **Confirming outlets?** Yes, the *Hindu*, *Times of India*, and *NDTV* reported ISRO's RLV-TD (Reusable Launch Vehicle – Technology Demonstrator) test from Sriharikota on May 23, 2016. However, no recent test at Sriharikota matches the headline; the 2023 and 2024 RLV landing experiments were conducted at Chitradurga, not Sriharikota.  \n3. **Any contradictions?** The headline is factually correct for the historic 2016 test, but if interpreted as a current event, it contradicts the location of recent ISRO RLV tests (which occurred at Chitradurga). No contradictions arise for the 2016 event.  \n4. **Confidence:** Medium – The statement is accurate only for a specific past event, not for any recent test.",
+    "is_fraud": false
+  }
+]

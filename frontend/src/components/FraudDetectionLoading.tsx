@@ -1,32 +1,23 @@
-import { useState, useEffect } from 'react';
+/**
+ * FraudDetectionLoading — Server-Driven Stage Display
+ * ────────────────────────────────────────────────────
+ * Renders the pipeline loading UI based on stages received from the
+ * backend SSE stream. NO local timers or setTimeout — the backend
+ * is the absolute source of truth for stage progression.
+ *
+ * Props:
+ *   stages: FraudStageEvent[] — array of stages received so far from SSE
+ */
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ShieldAlert } from 'lucide-react';
+import type { FraudStageEvent } from '../services/api';
 
-const steps = [
-  { time: 0, text: 'Stage 1/4 — SCOUT: Searching for evidence'},
-  { time: 3000, text: 'Stage 2/4 — READER: Scraping top sources'},
-  { time: 6000, text: 'Stage 3/4 — ANALYST: EVIDENCE-BACKED investigation'},
-  { time: 9000, text: 'Stage 4/4 — VERDICT: Refining the Final Verdict'}
-];
+interface FraudDetectionLoadingProps {
+  stages: FraudStageEvent[];
+}
 
-export function FraudDetectionLoading() {
-  const [activeStepIndex, setActiveStepIndex] = useState(-1);
-
-  useEffect(() => {
-    const timeouts: number[] = [];
-
-    steps.forEach((step, index) => {
-      const timeout = window.setTimeout(() => {
-        setActiveStepIndex(index);
-      }, step.time);
-      timeouts.push(timeout);
-    });
-
-    return () => {
-      timeouts.forEach(clearTimeout);
-    };
-  }, []);
-
+export function FraudDetectionLoading({ stages }: FraudDetectionLoadingProps) {
   return (
     <div className="relative z-20 w-full transition-colors">
       <div className="w-full relative">
@@ -36,7 +27,7 @@ export function FraudDetectionLoading() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white/90 dark:bg-white/90 backdrop-blur-xl border border-gray-300/50 dark:border-gray-300 p-8 rounded-2xl shadow-2xl max-w-lg w-full pointer-events-auto shadow-orange-900/20"
+            className="bg-white/90 dark:bg-white/90 backdrop-blur-xl border border-gray-300/50 dark:border-gray-300 p-5 sm:p-8 rounded-2xl shadow-2xl max-w-lg w-[90%] sm:w-full pointer-events-auto shadow-orange-900/20"
           >
             <div className="flex items-center gap-3 mb-6 border-b border-gray-300/50 pb-4">
                <ShieldAlert className="text-orange-500" size={24} />
@@ -44,33 +35,49 @@ export function FraudDetectionLoading() {
             </div>
             <div className="space-y-5">
               <AnimatePresence>
-                {steps.map((step, index) => {
-                  const isCompleted = index < activeStepIndex;
-                  const isVisible = index <= activeStepIndex;
+                {stages.length === 0 && (
+                  <motion.div
+                    key="connecting"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-3"
+                  >
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-[18px] h-[18px] border-2 border-orange-500 border-t-transparent rounded-full shrink-0"
+                    />
+                    <p className="text-sm text-gray-600">Connecting to analysis engine...</p>
+                  </motion.div>
+                )}
 
-                  if (!isVisible) return null;
+                {stages.map((stage, index) => {
+                  const isCompleted = index < stages.length - 1;
+                  const isActive = index === stages.length - 1;
 
                   return (
                     <motion.div
-                      key={index}
+                      key={stage.stage}
                       initial={{ opacity: 0, x: -15, height: 0 }}
                       animate={{ opacity: 1, x: 0, height: 'auto' }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
                       className="flex items-start gap-3 overflow-hidden"
                     >
                       <div className="mt-0.5 shrink-0">
                         {isCompleted ? (
                            <CheckCircle2 className="text-emerald-400" size={18} />
-                        ) : (
+                        ) : isActive ? (
                            <motion.div 
                              animate={{ rotate: 360 }}
                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                              className="w-[18px] h-[18px] border-2 border-orange-500 border-t-transparent rounded-full"
                            />
-                        )}
+                        ) : null}
                       </div>
                       <div className="flex-1">
                         <p className={`text-sm ${isCompleted ? 'text-gray-600' : 'text-gray-900 font-medium shadow-sm'} transition-colors`}>
-                          {step.text}
+                          Stage {stage.sequence}/4 — {stage.stage}: {stage.text}
                         </p>
                       </div>
                       <span className="text-xs text-gray-500 font-mono mt-0.5"></span>
@@ -83,7 +90,7 @@ export function FraudDetectionLoading() {
         </div>
 
         {/* Skeleton Layout */}
-        <div className="bg-white rounded-2xl p-6 lg:p-8 border border-gray-200 shadow-2xl opacity-50 select-none max-w-6xl mx-auto mt-8">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-2xl opacity-50 select-none max-w-6xl mx-auto mt-8">
            
            {/* Header Skeleton */}
            <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200/60">

@@ -61,11 +61,11 @@ export function HeroSection() {
       <Navbar isDarkBg={true} />
 
       {/* Hero Content Left (Command Aesthetic) */}
-      <div className="relative z-30 flex-1 flex flex-col items-start justify-center w-full mt-16 text-left max-w-7xl mx-auto px-4 md:px-12">
+      <div className="relative z-30 flex-1 flex flex-col items-start justify-center w-full mt-20 sm:mt-16 text-left max-w-7xl mx-auto px-4 md:px-12">
         
         {/* Title and Button Container */}
-        <div className="flex items-center justify-between w-full relative z-20 mb-4">
-          <h1 className="text-7xl md:text-9xl font-bold tracking-tight text-white flex overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full relative z-20 mb-4 gap-4">
+          <h1 className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-tight text-white flex overflow-hidden">
             {titleText.map((letter, i) => (
               <span
                 key={i}
@@ -79,7 +79,7 @@ export function HeroSection() {
 
           {/* Call to Action Buttons (Right aligned in Flexbox) */}
           <div
-            className="hidden md:flex flex-col items-center w-full max-w-xs gap-3 mt-6 ml-auto animate-blur-fade-up"
+            className="flex flex-col items-center w-full max-w-xs gap-3 mt-2 md:mt-6 md:ml-auto animate-blur-fade-up"
             style={{ animationDelay: '0.8s' }}
           >
             <Link 
@@ -103,7 +103,7 @@ export function HeroSection() {
 
         {/* Settling phrase - Left Aligned below heading */}
         <div 
-          className="flex space-x-2 text-xl md:text-2xl font-medium text-primary mb-6 justify-start w-full animate-blur-fade-up drop-shadow-md"
+          className="flex flex-wrap gap-x-2 gap-y-1 text-base sm:text-xl md:text-2xl font-medium text-primary mb-4 sm:mb-6 justify-start w-full animate-blur-fade-up drop-shadow-md"
           style={{ animationDelay: '0.9s' }}
         >
           {phrase.map((word, i) => (
@@ -112,10 +112,10 @@ export function HeroSection() {
         </div>
 
         <p
-          className="text-lg md:text-xl text-slate-200 max-w-xl mb-8 animate-blur-fade-up drop-shadow-md"
+          className="text-sm sm:text-lg md:text-xl text-slate-200 max-w-xl mb-6 sm:mb-8 animate-blur-fade-up drop-shadow-md"
           style={{ animationDelay: '1.0s' }}
         >
-          Real-time fact-checking powered by Groq LPU & Agentic AI. Paste a claim, URL, or image to uncover the truth.
+          Real-time fact-checking powered by Openrouter & Agentic AI. Paste a claim, URL, or image to uncover the truth.
         </p>
       </div>
     </section>
